@@ -119,17 +119,19 @@ aws ecs run-task \
 echo ">> Waiting for migration to complete..."
 sleep 30
 
-# ---- Step 8: Force new deployment ----
-echo ">> Deploying new versions..."
+# ---- Step 8: Start ECS services (set desired count to 1) ----
+echo ">> Starting ECS services..."
 aws ecs update-service \
   --cluster "${CLUSTER_NAME}" \
   --service "${ENV}-web" \
+  --desired-count 1 \
   --force-new-deployment \
   --region "${REGION}" > /dev/null
 
 aws ecs update-service \
   --cluster "${CLUSTER_NAME}" \
   --service "${ENV}-ws" \
+  --desired-count 1 \
   --force-new-deployment \
   --region "${REGION}" > /dev/null
 

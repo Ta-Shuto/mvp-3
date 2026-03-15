@@ -252,7 +252,7 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       MultiAZ: false
       BackupRetentionPeriod: 1
-      DeletionProtection: true
+      DeletionProtection: false
       StorageEncrypted: true
 
   # ============================================
@@ -538,7 +538,7 @@ Resources:
       ServiceName: !Sub "${Environment}-web"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref NextJSTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 0
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -558,7 +558,7 @@ Resources:
       ServiceName: !Sub "${Environment}-ws"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref WSServerTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 0
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
