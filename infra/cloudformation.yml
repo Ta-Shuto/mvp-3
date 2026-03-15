@@ -251,7 +251,7 @@ Resources:
         - !Ref DBSecurityGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
       MultiAZ: false
-      BackupRetentionPeriod: 7
+      BackupRetentionPeriod: 1
       DeletionProtection: true
       StorageEncrypted: true
 
