@@ -1,0 +1,376 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ========== Enums ==========
+
+enum Role {
+  ADMIN
+  INTERVIEWER
+  INTERVIEWEE
+  OPERATOR
+  SYSTEM
+}
+
+enum UseCase {
+  VOLUNTARY_RETIREMENT
+  AUDIT
+}
+
+enum CaseStatus {
+  PRE_INPUT_PENDING
+  PRE_INPUT_SUBMITTED
+  IN_MEETING
+  MEETING_ENDED
+  CLOSED
+}
+
+enum CaseProgress {
+  RECEPTION
+  INITIAL_JUDGMENT
+  INVESTIGATION_PLAN
+  PREPARATION
+  EXECUTION
+  RECORDING
+  POLICY_DECISION
+  COMPLETED
+}
+
+enum Tone {
+  POLITE
+  NEUTRAL
+  STRONG
+}
+
+enum Confidence {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum RiskItemStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum MeetingEndReason {
+  MANUAL
+  SILENCE
+  NO_PARTICIPANTS
+  MAX_DURATION
+}
+
+// ========== Models ==========
+
+model Organization {
+  id                   String   @id @default(cuid())
+  name                 String
+  retentionDays        Int      @default(365)
+  meetingUrlReuseRule  String   @default("new_case")
+  autoEndSettings      Json     @default("{\"silenceMinutes\":10,\"endOnNoParticipants\":true,\"maxDurationHours\":3}")
+  notificationSettings Json     @default("{\"botChatMessage\":true,\"botDisplayName\":true,\"inAppConsent\":false}")
+  consentSettings      Json     @default("{\"noConsentAction\":\"no_entry\",\"logItems\":[\"datetime\",\"target\",\"method\",\"version\",\"meetingUrl\"]}")
+  retrySettings        Json     @default("{\"maxRetries\":3,\"retryIntervalSeconds\":30}")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  users      User[]
+  templates  Template[]
+  cases      Case[]
+  auditLogs  AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  organizationId String
+  role           Role
+  name           String
+  email          String   @unique
+  passwordHash   String?
+  caseViewScope  String   @default("assigned")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization    Organization      @relation(fields: [organizationId], references: [id])
+  assignedCases   CaseAssignment[]
+  primaryCases    Case[]            @relation("PrimaryAssignee")
+  auditLogs       AuditLog[]
+  templateUpdates Template[]        @relation("TemplateUpdater")
+  scriptVersions  ScriptVersion[]
+  progressHistory ProgressHistory[] @relation("ProgressUpdater")
+
+  @@index([organizationId])
+  @@map("users")
+}
+
+model Template {
+  id                  String   @id @default(cuid())
+  organizationId      String
+  useCase             UseCase
+  preQuestions         Json     @default("[]")
+  aiChatPrompt        String   @default("") @db.Text
+  summaryPrompt       String   @default("") @db.Text
+  scriptPrompt        String   @default("") @db.Text
+  riskDetectionPrompt String   @default("") @db.Text
+  rephrasingPrompt    String   @default("") @db.Text
+  defaultTone         Tone     @default(POLITE)
+  updatedById         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  organization Organization      @relation(fields: [organizationId], references: [id])
+  updatedBy    User?             @relation("TemplateUpdater", fields: [updatedById], references: [id])
+  versions     TemplateVersion[]
+
+  @@unique([organizationId, useCase])
+  @@map("templates")
+}
+
+model TemplateVersion {
+  id         String    @id @default(cuid())
+  templateId String
+  version    Int
+  content    Json
+  restoredBy String?
+  restoredAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  template Template @relation(fields: [templateId], references: [id])
+
+  @@index([templateId])
+  @@map("template_versions")
+}
+
+model Case {
+  id                String       @id @default(cuid())
+  organizationId    String
+  useCase           UseCase
+  meetingUrl        String?
+  scheduledAt       DateTime?
+  status            CaseStatus   @default(PRE_INPUT_PENDING)
+  progress          CaseProgress @default(RECEPTION)
+  nextTask          String?
+  deadline          DateTime?
+  primaryAssigneeId String?
+  category          String?
+  issue             String?      @db.Text
+  conclusion        String?      @db.Text
+  action            String?      @db.Text
+  referencePoint    String?
+  templateSnapshot  Json?
+  closedAt          DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  organization     Organization      @relation(fields: [organizationId], references: [id])
+  primaryAssignee  User?             @relation("PrimaryAssignee", fields: [primaryAssigneeId], references: [id])
+  assignments      CaseAssignment[]
+  preChat          PreChat?
+  meetings         Meeting[]
+  scriptGeneration ScriptGeneration?
+  progressHistory  ProgressHistory[]
+  referencesFrom   CaseReference[]   @relation("ReferenceFrom")
+  referencesTo     CaseReference[]   @relation("ReferenceTo")
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, updatedAt])
+  @@map("cases")
+}
+
+model CaseAssignment {
+  id     String @id @default(cuid())
+  caseId String
+  userId String
+
+  case Case @relation(fields: [caseId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([caseId, userId])
+  @@map("case_assignments")
+}
+
+model CaseReference {
+  id         String @id @default(cuid())
+  fromCaseId String
+  toCaseId   String
+  reason     String @db.Text
+
+  fromCase Case @relation("ReferenceFrom", fields: [fromCaseId], references: [id])
+  toCase   Case @relation("ReferenceTo", fields: [toCaseId], references: [id])
+
+  @@unique([fromCaseId, toCaseId])
+  @@map("case_references")
+}
+
+model ProgressHistory {
+  id            String       @id @default(cuid())
+  caseId        String
+  previousValue CaseProgress
+  currentValue  CaseProgress
+  updatedById   String
+  createdAt     DateTime     @default(now())
+
+  case      Case @relation(fields: [caseId], references: [id])
+  updatedBy User @relation("ProgressUpdater", fields: [updatedById], references: [id])
+
+  @@index([caseId])
+  @@map("progress_history")
+}
+
+model PreChat {
+  id          String    @id @default(cuid())
+  caseId      String    @unique
+  token       String    @unique @default(cuid())
+  consentAt   DateTime?
+  urlActive   Boolean   @default(true)
+  isSubmitted Boolean   @default(false)
+  submittedAt DateTime?
+  aiSummary   String?   @db.Text
+  script      String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  case     Case              @relation(fields: [caseId], references: [id])
+  answers  PreChatAnswer[]
+  messages AIChatMessage[]
+
+  @@map("pre_chats")
+}
+
+model PreChatAnswer {
+  id         String @id @default(cuid())
+  preChatId  String
+  questionId String
+  answerText String @db.Text
+
+  preChat PreChat @relation(fields: [preChatId], references: [id])
+
+  @@index([preChatId])
+  @@map("pre_chat_answers")
+}
+
+model AIChatMessage {
+  id        String   @id @default(cuid())
+  preChatId String
+  role      String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  preChat PreChat @relation(fields: [preChatId], references: [id])
+
+  @@index([preChatId])
+  @@map("ai_chat_messages")
+}
+
+model Meeting {
+  id             String           @id @default(cuid())
+  caseId         String
+  audioFileUrl   String?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  endReason      MeetingEndReason?
+  meetingSummary String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  case        Case         @relation(fields: [caseId], references: [id])
+  transcripts Transcript[]
+  riskItems   RiskItem[]
+
+  @@index([caseId])
+  @@map("meetings")
+}
+
+model Transcript {
+  id         String     @id @default(cuid())
+  meetingId  String
+  speaker    String
+  text       String     @db.Text
+  timestamp  Float
+  isFinal    Boolean    @default(false)
+  confidence Confidence @default(MEDIUM)
+  createdAt  DateTime   @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id])
+
+  @@index([meetingId])
+  @@map("transcripts")
+}
+
+model RiskItem {
+  id         String         @id @default(cuid())
+  meetingId  String
+  text       String         @db.Text
+  speaker    String
+  reason     String         @db.Text
+  rephrasing String?        @db.Text
+  status     RiskItemStatus @default(PENDING)
+  timestamp  Float
+  confidence Confidence     @default(MEDIUM)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id])
+
+  @@index([meetingId])
+  @@map("risk_items")
+}
+
+model ScriptGeneration {
+  id                String   @id @default(cuid())
+  caseId            String   @unique
+  inquiryEmailText  String?  @db.Text
+  preAiResponseText String?  @db.Text
+  usePreAiResponse  Boolean  @default(false)
+  generatedScript   Json?
+  generationLog     Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  case     Case            @relation(fields: [caseId], references: [id])
+  versions ScriptVersion[]
+
+  @@map("script_generations")
+}
+
+model ScriptVersion {
+  id                 String   @id @default(cuid())
+  scriptGenerationId String
+  version            Int
+  content            Json
+  editedById         String?
+  createdAt          DateTime @default(now())
+
+  scriptGeneration ScriptGeneration @relation(fields: [scriptGenerationId], references: [id])
+  editedBy         User?            @relation(fields: [editedById], references: [id])
+
+  @@index([scriptGenerationId])
+  @@map("script_versions")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  caseId         String?
+  eventType      String
+  details        Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([organizationId, eventType])
+  @@index([organizationId, createdAt])
+  @@map("audit_logs")
+}
