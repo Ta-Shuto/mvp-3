@@ -11,7 +11,10 @@
     "db:migrate": "npx prisma migrate dev",
     "db:push": "npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "ws:dev": "cd ws-server && npx tsx watch index.ts",
+    "ws:start": "cd ws-server && npx tsx index.ts",
+    "batch:auto-delete": "npx tsx src/server/batch/auto-delete.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

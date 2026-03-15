@@ -1,0 +1,22 @@
+{
+  "name": "ws-server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch index.ts",
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.3",
+    "pg": "^8.20.0",
+    "@prisma/client": "^7.5.0",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@anthropic-ai/sdk": "^0.78.0",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}
