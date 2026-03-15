@@ -121,8 +121,26 @@ export const preChatRouter = router({
         },
       });
 
-      // TODO: Call Claude API with template prompt
-      const aiResponse = "AI応答はClaude API統合後に有効になります。";
+      // Call Claude API with template prompt (FR-029)
+      const { generateAIResponse } = await import("@/server/services/ai");
+      const templateSnapshot = preChat.case.templateSnapshot as any;
+      const aiChatPrompt = templateSnapshot?.aiChatPrompt || "あなたは面談の事前相談を受けるAIアシスタントです。丁寧に、共感を持って対応してください。";
+
+      const chatHistory = preChat.messages.map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      }));
+      chatHistory.push({ role: "user", content: input.content });
+
+      let aiResponse: string;
+      try {
+        aiResponse = await generateAIResponse({
+          systemPrompt: aiChatPrompt,
+          messages: chatHistory,
+        });
+      } catch {
+        aiResponse = "申し訳ございません。現在AI応答を生成できません。しばらくしてから再試行してください。";
+      }
 
       // Save AI response
       const aiMessage = await prisma.aIChatMessage.create({

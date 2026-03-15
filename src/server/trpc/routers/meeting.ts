@@ -110,13 +110,17 @@ export const meetingRouter = router({
     .input(
       z.object({
         meetingId: z.string(),
-        summary: z.string(),
+        summary: z.object({
+          keyPoints: z.string().optional(),
+          actionItems: z.string().optional(),
+          concerns: z.string().optional(),
+        }),
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.meeting.update({
         where: { id: input.meetingId },
-        data: { meetingSummary: input.summary },
+        data: { meetingSummary: input.summary as any },
       });
     }),
 
