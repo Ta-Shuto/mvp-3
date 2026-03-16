@@ -17,6 +17,10 @@ set -euo pipefail
 #   DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY
 # ============================================
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${PROJECT_ROOT}"
+
 ENV="${1:-production}"
 REGION="${AWS_REGION:-ap-northeast-1}"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -30,9 +34,11 @@ echo ""
 
 # ---- Step 1: Load environment variables ----
 if [ -f ".env.production" ]; then
+  set +u
   set -a
   source .env.production
   set +a
+  set -u
 else
   echo "ERROR: .env.production not found."
   echo "Create it with: DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY"
