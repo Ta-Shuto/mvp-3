@@ -30,7 +30,9 @@ echo ""
 
 # ---- Step 1: Load environment variables ----
 if [ -f ".env.production" ]; then
+  set -a
   source .env.production
+  set +a
 else
   echo "ERROR: .env.production not found."
   echo "Create it with: DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY"
