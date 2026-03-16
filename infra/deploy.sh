@@ -34,11 +34,14 @@ echo ""
 
 # ---- Step 1: Load environment variables ----
 if [ -f ".env.production" ]; then
+  _tmpenv=$(mktemp)
+  tr -d '\r' < .env.production > "$_tmpenv"
   set +u
   set -a
-  source <(tr -d '\r' < .env.production)
+  source "$_tmpenv"
   set +a
   set -u
+  rm -f "$_tmpenv"
 else
   echo "ERROR: .env.production not found."
   echo "Create it with: DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY"
