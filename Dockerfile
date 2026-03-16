@@ -9,7 +9,6 @@ COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
 # Generate Prisma client
 COPY prisma ./prisma
-COPY src/generated ./src/generated
 RUN npx prisma generate
 
 # Stage 2: Build

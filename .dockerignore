@@ -6,5 +6,6 @@ node_modules
 .env
 .env.local
 .env*.local
+.env.production
 docker-compose*.yml
 Dockerfile*
