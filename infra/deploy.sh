@@ -36,7 +36,7 @@ echo ""
 if [ -f ".env.production" ]; then
   set +u
   set -a
-  source .env.production
+  source <(tr -d '\r' < .env.production)
   set +a
   set -u
 else
