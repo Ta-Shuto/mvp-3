@@ -399,6 +399,8 @@ Resources:
               Value: !Sub "redis://${RedisCluster.RedisEndpoint.Address}:${RedisCluster.RedisEndpoint.Port}"
             - Name: NEXTAUTH_URL
               Value: !If [HasDomain, !Sub "https://${DomainName}", !Sub "http://${ALB.DNSName}"]
+            - Name: AUTH_TRUST_HOST
+              Value: "true"
             - Name: NEXTAUTH_SECRET
               Value: !Ref NextAuthSecret
             - Name: ANTHROPIC_API_KEY
