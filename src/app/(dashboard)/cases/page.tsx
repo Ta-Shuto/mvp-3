@@ -105,7 +105,7 @@ function CasesPageContent() {
         </div>
         <button
           onClick={() => setShowCreatePage(true)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90"
+          className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90"
         >
           + 新規案件
         </button>
@@ -128,8 +128,8 @@ function CasesPageContent() {
               (statusFilter === "PRE_INPUT_PENDING" && tab.key === "active") ||
               (statusFilter === "MEETING_ENDED" && tab.key === "investigating") ||
               (statusFilter === "CLOSED" && tab.key === "closed")
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground hover:bg-accent"
+                ? "btn-glass-primary"
+                : "bg-secondary text-muted-foreground hover:bg-white/40"
             }`}
           >
             {tab.label} {tab.count}
@@ -197,10 +197,10 @@ function CasesPageContent() {
       </div>
 
       {/* 案件テーブル */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-white/20 glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground">案件名</th>
               <th className="text-left p-3 font-medium text-muted-foreground">カテゴリ</th>
               <th className="text-left p-3 font-medium text-muted-foreground">ステータス</th>
@@ -213,7 +213,7 @@ function CasesPageContent() {
           </thead>
           <tbody>
             {cases.data?.cases.map((c: any) => (
-              <tr key={c.id} className="border-b border-border hover:bg-accent/50">
+              <tr key={c.id} className="border-b border-white/20 hover:bg-white/30">
                 <td className="p-3">
                   <Link href={`/cases/${c.id}`} className="font-medium text-primary hover:underline">
                     {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
@@ -269,8 +269,8 @@ function CasesPageContent() {
               onClick={() => setPage(p)}
               className={`px-3 py-1 rounded text-sm ${
                 p === page
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary hover:bg-accent"
+                  ? "btn-glass-primary"
+                  : "bg-secondary hover:bg-white/40"
               }`}
             >
               {p}
@@ -337,7 +337,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ステップ1: 通報内容入力 */}
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
             <h2 className="font-semibold">通報内容を入力</h2>
@@ -394,7 +394,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* ステップ2: 案件情報 */}
-        <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+        <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2">
             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
             <h2 className="font-semibold">案件情報を確認・修正</h2>
@@ -473,7 +473,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
         <button
           type="submit"
           disabled={createMutation.isPending || !caseName}
-          className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+          className="w-full px-4 py-3 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
         >
           {createMutation.isPending ? "登録中..." : "案件を登録する"}
         </button>

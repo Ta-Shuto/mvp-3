@@ -45,7 +45,7 @@ export default function OpsPage() {
           { label: "期限超過/間近", value: urgentCases.data?.length ?? 0, color: "text-destructive" },
           { label: "長期未更新", value: staleCases.data?.length ?? 0, color: "text-orange-600" },
         ].map((card) => (
-          <div key={card.label} className="bg-card border border-border rounded-lg p-4">
+          <div key={card.label} className="border border-white/40 rounded-2xl bg-white/30 p-4">
             <p className="text-sm text-muted-foreground">{card.label}</p>
             <p className={`text-3xl font-bold mt-1 ${card.color ?? ""}`}>{card.value}</p>
           </div>
@@ -54,7 +54,7 @@ export default function OpsPage() {
 
       {/* 進捗別サマリー */}
       {summary.data && (
-        <section className="bg-card border border-border rounded-lg p-5">
+        <section className="bg-card border border-border rounded-2xl p-5">
           <h2 className="font-semibold mb-4">進捗ステータス別 案件数</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(progressLabels).map(([key, label]) => {
@@ -62,7 +62,7 @@ export default function OpsPage() {
               const active = data?.active ?? 0;
               const closed = data?.closed ?? 0;
               return (
-                <div key={key} className="border border-border rounded-lg p-3">
+                <div key={key} className="border border-white/40 rounded-2xl bg-white/30 p-3">
                   <p className="text-xs text-muted-foreground">{label}</p>
                   <p className="text-xl font-bold mt-1">{active}</p>
                   <p className="text-xs text-muted-foreground">完了: {closed}</p>
@@ -74,13 +74,13 @@ export default function OpsPage() {
       )}
 
       {/* 期限超過・間近の案件 */}
-      <section className="bg-card border border-border rounded-lg overflow-hidden">
+      <section className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-border">
           <h2 className="font-semibold">要対応案件（期限7日以内・超過）</h2>
         </div>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-border glass-thead">
               <th className="text-left p-3">案件名</th>
               <th className="text-left p-3">担当者</th>
               <th className="text-left p-3">ステータス</th>
@@ -94,7 +94,7 @@ export default function OpsPage() {
                 ? Math.ceil((new Date(c.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
                 : null;
               return (
-                <tr key={c.id} className="border-b border-border hover:bg-accent/50">
+                <tr key={c.id} className="border-b border-border hover:bg-white/30">
                   <td className="p-3">
                     <Link href={`/cases/${c.id}`} className="text-primary hover:underline font-medium">
                       {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
@@ -132,13 +132,13 @@ export default function OpsPage() {
       </section>
 
       {/* 長期未更新案件 */}
-      <section className="bg-card border border-border rounded-lg overflow-hidden">
+      <section className="bg-card border border-border rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-border">
           <h2 className="font-semibold">長期未更新案件（7日以上）</h2>
         </div>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-border glass-thead">
               <th className="text-left p-3">案件名</th>
               <th className="text-left p-3">担当者</th>
               <th className="text-left p-3">ステータス</th>
@@ -150,7 +150,7 @@ export default function OpsPage() {
             {staleCases.data?.map((c: any) => {
               const daysSince = Math.floor((Date.now() - new Date(c.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
               return (
-                <tr key={c.id} className="border-b border-border hover:bg-accent/50">
+                <tr key={c.id} className="border-b border-border hover:bg-white/30">
                   <td className="p-3">
                     <Link href={`/cases/${c.id}`} className="text-primary hover:underline font-medium">
                       {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}

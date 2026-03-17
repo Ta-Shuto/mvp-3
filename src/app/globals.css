@@ -29,49 +29,49 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-  --primary: #171717;
-  --primary-foreground: #fafafa;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #171717;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --accent: #f5f5f5;
-  --accent-foreground: #171717;
+  --background: #f0f4ff;
+  --foreground: #1e293b;
+  --card: rgba(255, 255, 255, 0.55);
+  --card-foreground: #1e293b;
+  --popover: rgba(255, 255, 255, 0.85);
+  --popover-foreground: #1e293b;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: rgba(255, 255, 255, 0.4);
+  --secondary-foreground: #475569;
+  --muted: rgba(255, 255, 255, 0.4);
+  --muted-foreground: #64748b;
+  --accent: rgba(255, 255, 255, 0.6);
+  --accent-foreground: #1e293b;
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #171717;
-  --radius: 0.5rem;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.6);
+  --input: rgba(255, 255, 255, 0.6);
+  --ring: #6366f1;
+  --radius: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-    --card: #0a0a0a;
-    --card-foreground: #fafafa;
-    --popover: #0a0a0a;
-    --popover-foreground: #fafafa;
-    --primary: #fafafa;
-    --primary-foreground: #171717;
-    --secondary: #262626;
-    --secondary-foreground: #fafafa;
-    --muted: #262626;
-    --muted-foreground: #a3a3a3;
-    --accent: #262626;
-    --accent-foreground: #fafafa;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fafafa;
-    --border: #262626;
-    --input: #262626;
-    --ring: #d4d4d4;
+    --background: #0f172a;
+    --foreground: #e2e8f0;
+    --card: rgba(30, 41, 59, 0.6);
+    --card-foreground: #e2e8f0;
+    --popover: rgba(30, 41, 59, 0.9);
+    --popover-foreground: #e2e8f0;
+    --primary: #818cf8;
+    --primary-foreground: #ffffff;
+    --secondary: rgba(30, 41, 59, 0.5);
+    --secondary-foreground: #cbd5e1;
+    --muted: rgba(30, 41, 59, 0.5);
+    --muted-foreground: #94a3b8;
+    --accent: rgba(51, 65, 85, 0.5);
+    --accent-foreground: #e2e8f0;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: rgba(51, 65, 85, 0.5);
+    --input: rgba(51, 65, 85, 0.5);
+    --ring: #818cf8;
   }
 }
 
@@ -79,4 +79,99 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Glassmorphism: auto-apply backdrop-filter to card elements */
+.bg-card,
+.glass-card {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* Glass sidebar */
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.45);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+}
+@media (prefers-color-scheme: dark) {
+  .glass-sidebar {
+    background: rgba(15, 23, 42, 0.7);
+    border-right-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+/* Gradient primary button */
+.btn-glass-primary {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+  transition: all 0.2s;
+}
+.btn-glass-primary:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  transform: translateY(-1px);
+}
+.btn-glass-primary:disabled {
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Glass modal overlay */
+.glass-overlay {
+  background: rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* Glass modal content */
+.glass-modal {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+@media (prefers-color-scheme: dark) {
+  .glass-modal {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(51, 65, 85, 0.5);
+  }
+}
+
+/* Hover lift effect for cards */
+.hover-lift {
+  transition: all 0.3s;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Nav item active with gradient */
+.nav-active {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Gradient background for main area */
+.glass-bg {
+  background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 25%, #ffffff 50%, #ecfdf5 75%, #cffafe 100%);
+}
+@media (prefers-color-scheme: dark) {
+  .glass-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  }
+}
+
+/* Table header glass effect */
+.glass-thead {
+  background: rgba(255, 255, 255, 0.3);
+}
+@media (prefers-color-scheme: dark) {
+  .glass-thead {
+    background: rgba(30, 41, 59, 0.3);
+  }
 }

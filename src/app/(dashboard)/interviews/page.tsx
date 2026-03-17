@@ -55,7 +55,7 @@ export default function MeetingManagementPage() {
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90"
+          className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90"
         >
           + 新規面談
         </button>
@@ -75,8 +75,8 @@ export default function MeetingManagementPage() {
             onClick={() => { setStatusFilter(tab.key); setPage(1); }}
             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
               statusFilter === tab.key
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground hover:bg-accent"
+                ? "btn-glass-primary"
+                : "bg-secondary text-muted-foreground hover:bg-white/40"
             }`}
           >
             {tab.label} {tab.count}
@@ -85,10 +85,10 @@ export default function MeetingManagementPage() {
       </div>
 
       {/* 面談テーブル */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-border glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground">案件名</th>
               <th className="text-left p-3 font-medium text-muted-foreground">面談担当者</th>
               <th className="text-left p-3 font-medium text-muted-foreground">予定日時</th>
@@ -101,7 +101,7 @@ export default function MeetingManagementPage() {
             {meetings.data?.meetings.map((m: any) => {
               const status = getMeetingStatus(m);
               return (
-                <tr key={m.id} className="border-b border-border hover:bg-accent/50">
+                <tr key={m.id} className="border-b border-border hover:bg-white/30">
                   <td className="p-3">
                     <Link
                       href={`/cases/${m.case?.id}/meeting`}
@@ -200,8 +200,8 @@ function CreateMeetingModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card border border-border rounded-lg w-full max-w-md mx-4">
+    <div className="fixed inset-0 glass-overlay flex items-center justify-center z-50">
+      <div className="glass-modal rounded-2xl w-full max-w-md mx-4">
         <div className="flex items-center gap-3 p-6 border-b border-border">
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">
             ←
@@ -270,14 +270,14 @@ function CreateMeetingModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent transition-colors"
+              className="flex-1 px-4 py-2 border border-white/50 rounded-xl bg-white/30 text-sm hover:bg-white/40 transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={createMeeting.isPending || !caseId || !scheduledAt}
-              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
               {createMeeting.isPending ? "登録中..." : "面談を登録する"}
             </button>

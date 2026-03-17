@@ -41,6 +41,13 @@ const statusColors: Record<string, string> = {
   CLOSED: "bg-gray-100 text-gray-600",
 };
 
+const statIcons = [
+  { icon: "📋", gradient: "from-blue-100 to-blue-50", iconColor: "text-blue-500" },
+  { icon: "⚡", gradient: "from-green-100 to-green-50", iconColor: "text-green-500" },
+  { icon: "🔴", gradient: "from-red-100 to-red-50", iconColor: "text-red-500" },
+  { icon: "👥", gradient: "from-purple-100 to-purple-50", iconColor: "text-purple-500" },
+];
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const stats = trpc.dashboard.getStats.useQuery();
@@ -54,7 +61,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">ダッシュボード</h1>
+        <h1 className="text-2xl font-bold text-foreground">ダッシュボード</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {userName} さん、おかえりなさい
         </p>
@@ -62,31 +69,35 @@ export default function DashboardPage() {
 
       {/* 統計カード */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Link href="/cases" className="p-5 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors">
-          <p className="text-sm text-muted-foreground">総案件数</p>
-          <p className="text-3xl font-bold mt-2">{stats.data?.totalCases ?? "—"}</p>
-        </Link>
-        <Link href="/cases?status=active" className="p-5 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors">
-          <p className="text-sm text-muted-foreground">対応中案件</p>
-          <p className="text-3xl font-bold mt-2 text-blue-600">{stats.data?.activeCases ?? "—"}</p>
-        </Link>
-        <div className="p-5 bg-card border border-border rounded-lg">
-          <p className="text-sm text-muted-foreground">期限超過/間近</p>
-          <p className={`text-3xl font-bold mt-2 ${(urgentCases.data?.length ?? 0) > 0 ? "text-destructive" : ""}`}>
-            {urgentCases.data?.length ?? "—"}
-          </p>
-        </div>
-        <Link href="/users" className="p-5 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors">
-          <p className="text-sm text-muted-foreground">ユーザー数</p>
-          <p className="text-3xl font-bold mt-2">{stats.data?.userCount ?? "—"}</p>
-        </Link>
+        {[
+          { label: "総案件数", value: stats.data?.totalCases ?? "—", href: "/cases", idx: 0 },
+          { label: "対応中案件", value: stats.data?.activeCases ?? "—", href: "/cases?status=active", idx: 1, valueColor: "text-blue-600" },
+          { label: "期限超過/間近", value: urgentCases.data?.length ?? "—", idx: 2, valueColor: (urgentCases.data?.length ?? 0) > 0 ? "text-destructive" : "" },
+          { label: "ユーザー数", value: stats.data?.userCount ?? "—", href: "/users", idx: 3 },
+        ].map((card) => {
+          const Wrapper = card.href ? Link : "div";
+          const wrapperProps = card.href ? { href: card.href } : {};
+          return (
+            <Wrapper
+              key={card.label}
+              {...(wrapperProps as any)}
+              className="p-5 bg-card border border-border rounded-2xl hover-lift"
+            >
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${statIcons[card.idx].gradient} flex items-center justify-center text-xl mb-3`}>
+                {statIcons[card.idx].icon}
+              </div>
+              <p className="text-sm text-muted-foreground">{card.label}</p>
+              <p className={`text-3xl font-bold mt-1 ${card.valueColor ?? ""}`}>{card.value}</p>
+            </Wrapper>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 通知パネル */}
         <div className="lg:col-span-1 space-y-4">
           {/* 要対応案件 */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-3">要対応</h2>
             <div className="space-y-2">
               {urgentCases.data?.slice(0, 5).map((c: any) => {
@@ -97,7 +108,7 @@ export default function DashboardPage() {
                   <Link
                     key={c.id}
                     href={`/cases/${c.id}`}
-                    className="block p-2 rounded-lg hover:bg-accent transition-colors"
+                    className="block p-2.5 rounded-xl hover:bg-white/40 transition-colors"
                   >
                     <div className="flex justify-between items-start">
                       <p className="text-sm font-medium truncate pr-2">
@@ -122,7 +133,7 @@ export default function DashboardPage() {
           </section>
 
           {/* 長期未更新 */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-3">長期未更新</h2>
             <div className="space-y-2">
               {staleCases.data?.slice(0, 5).map((c: any) => {
@@ -131,7 +142,7 @@ export default function DashboardPage() {
                   <Link
                     key={c.id}
                     href={`/cases/${c.id}`}
-                    className="block p-2 rounded-lg hover:bg-accent transition-colors"
+                    className="block p-2.5 rounded-xl hover:bg-white/40 transition-colors"
                   >
                     <div className="flex justify-between items-start">
                       <p className="text-sm font-medium truncate pr-2">
@@ -152,18 +163,18 @@ export default function DashboardPage() {
           </section>
 
           {/* クイックアクション */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-3">クイックアクション</h2>
             <div className="space-y-2">
               <Link
                 href="/cases"
-                className="block w-full text-left px-3 py-2 text-sm rounded-lg border border-border hover:bg-accent transition-colors"
+                className="block w-full text-left px-3 py-2.5 text-sm rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
               >
                 + 新規案件を登録
               </Link>
               <Link
                 href="/interviews"
-                className="block w-full text-left px-3 py-2 text-sm rounded-lg border border-border hover:bg-accent transition-colors"
+                className="block w-full text-left px-3 py-2.5 text-sm rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
               >
                 面談を管理
               </Link>
@@ -174,7 +185,7 @@ export default function DashboardPage() {
         {/* メインエリア */}
         <div className="lg:col-span-2 space-y-6">
           {/* リスク評価マトリクス */}
-          <section className="bg-card border border-border rounded-lg p-5">
+          <section className="bg-card border border-border rounded-2xl p-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-semibold">リスク評価マトリクス</h2>
               {riskMatrix.data && (
@@ -202,7 +213,7 @@ export default function DashboardPage() {
                   const row = (riskMatrix.data?.[level] ?? {}) as Record<string, number>;
                   const rowTotal = Object.values(row).reduce((s, v) => s + v, 0);
                   return (
-                    <tr key={level} className="border-t border-border">
+                    <tr key={level} className="border-t border-white/30">
                       <td className="p-2">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${riskLevelColors[level]}`}>
                           {riskLevelLabels[level]}
@@ -232,11 +243,11 @@ export default function DashboardPage() {
           </section>
 
           {/* 最近の案件 */}
-          <section className="bg-card border border-border rounded-lg p-5">
+          <section className="bg-card border border-border rounded-2xl p-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-semibold">最近の案件</h2>
               <Link href="/cases" className="text-sm text-primary hover:underline">
-                すべて見る
+                すべて見る →
               </Link>
             </div>
             <div className="space-y-2">
@@ -244,7 +255,7 @@ export default function DashboardPage() {
                 <Link
                   key={c.id}
                   href={`/cases/${c.id}`}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/30 hover:bg-white/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div>

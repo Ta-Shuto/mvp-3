@@ -72,7 +72,7 @@ export default function AuditLogsPage() {
         <select
           value={filters.eventType ?? ""}
           onChange={(e) => setFilters((f) => ({ ...f, eventType: e.target.value || undefined, page: 1 }))}
-          className="px-3 py-2 border border-border rounded-lg bg-background text-sm"
+          className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
         >
           <option value="">イベント種別: 全て</option>
           {Object.entries(eventTypeLabels).map(([k, v]) => (
@@ -86,14 +86,14 @@ export default function AuditLogsPage() {
             type="date"
             value={filters.dateFrom}
             onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
           />
           <span className="text-muted-foreground">〜</span>
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
           />
         </div>
 
@@ -108,10 +108,10 @@ export default function AuditLogsPage() {
       </div>
 
       {/* ログ一覧 */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-border glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground w-8"></th>
               <th className="text-left p-3 font-medium text-muted-foreground">日時</th>
               <th className="text-left p-3 font-medium text-muted-foreground">イベント</th>
@@ -125,7 +125,7 @@ export default function AuditLogsPage() {
               <>
                 <tr
                   key={log.id}
-                  className="border-b border-border hover:bg-accent/50 cursor-pointer"
+                  className="border-b border-white/20 hover:bg-white/30 cursor-pointer"
                   onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                 >
                   <td className="p-3 text-muted-foreground text-xs">
@@ -158,8 +158,8 @@ export default function AuditLogsPage() {
                   </td>
                 </tr>
                 {expandedId === log.id && log.details && (
-                  <tr key={`${log.id}-detail`} className="border-b border-border">
-                    <td colSpan={6} className="p-4 bg-muted/30">
+                  <tr key={`${log.id}-detail`} className="border-b border-white/20">
+                    <td colSpan={6} className="p-4 bg-white/20">
                       <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
                         {JSON.stringify(log.details, null, 2)}
                       </pre>
@@ -182,7 +182,7 @@ export default function AuditLogsPage() {
           <button
             onClick={() => setFilters((f) => ({ ...f, page: Math.max(1, f.page - 1) }))}
             disabled={filters.page <= 1}
-            className="px-3 py-1 rounded-lg text-sm border border-border hover:bg-accent disabled:opacity-30"
+            className="px-3 py-1 rounded-xl text-sm border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
           >
             前へ
           </button>
@@ -192,7 +192,7 @@ export default function AuditLogsPage() {
           <button
             onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
             disabled={filters.page >= (logs.data as any)?.totalPages}
-            className="px-3 py-1 rounded-lg text-sm border border-border hover:bg-accent disabled:opacity-30"
+            className="px-3 py-1 rounded-xl text-sm border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
           >
             次へ
           </button>

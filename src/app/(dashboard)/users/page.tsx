@@ -64,17 +64,17 @@ export default function UsersPage() {
         </div>
         <button
           onClick={() => setShowInviteModal(true)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
         >
           + ユーザーを招待
         </button>
       </div>
 
       {/* ユーザー一覧テーブル */}
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b border-border glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground">名前</th>
               <th className="text-left p-3 font-medium text-muted-foreground">メール</th>
               <th className="text-left p-3 font-medium text-muted-foreground">部署</th>
@@ -87,10 +87,10 @@ export default function UsersPage() {
           </thead>
           <tbody>
             {users?.map((user: any) => (
-              <tr key={user.id} className="border-b border-border hover:bg-accent/50">
+              <tr key={user.id} className="border-b border-border hover:bg-white/30">
                 <td className="p-3">
                   <div className="flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 text-white text-xs font-medium">
                       {roleInitials[user.role] ?? "?"}
                     </span>
                     <span className="font-medium text-foreground">{user.name}</span>
@@ -210,8 +210,8 @@ function InviteModal({
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card border border-border rounded-lg w-full max-w-lg mx-4">
+    <div className="fixed inset-0 glass-overlay flex items-center justify-center z-50">
+      <div className="glass-modal rounded-2xl w-full max-w-lg mx-4">
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-lg font-bold">新規ユーザー招待</h2>
           <button
@@ -306,14 +306,14 @@ function InviteModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent transition-colors"
+              className="flex-1 px-4 py-2 border border-border rounded-xl text-sm bg-white/30 hover:bg-accent transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={isLoading || !name || !email || !password}
-              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="flex-1 px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {isLoading ? "招待中..." : "招待する"}
             </button>
@@ -358,8 +358,8 @@ function EditUserModal({
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card border border-border rounded-lg w-full max-w-md mx-4">
+    <div className="fixed inset-0 glass-overlay flex items-center justify-center z-50">
+      <div className="glass-modal rounded-2xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-lg font-bold">ユーザー編集</h2>
           <button onClick={onClose} className="text-sm text-primary hover:underline">閉じる</button>
@@ -423,14 +423,14 @@ function EditUserModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent"
+              className="flex-1 px-4 py-2 border border-border rounded-xl text-sm bg-white/30 hover:bg-accent"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
               {isLoading ? "保存中..." : "保存"}
             </button>

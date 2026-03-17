@@ -127,8 +127,8 @@ export default function TemplatesPage() {
             <button
               key={uc}
               onClick={() => { setSelectedUseCase(uc); setEditing(false); }}
-              className={`px-4 py-2 text-sm rounded-md ${
-                selectedUseCase === uc ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-accent"
+              className={`px-4 py-2 text-sm rounded-xl ${
+                selectedUseCase === uc ? "btn-glass-primary" : "bg-white/30 hover:bg-white/50"
               }`}
             >
               {useCaseLabels[uc]}
@@ -142,7 +142,7 @@ export default function TemplatesPage() {
       {t && !editing && (
         <div className="space-y-6">
           <div className="flex justify-end">
-            <button onClick={startEditing} className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90">
+            <button onClick={startEditing} className="px-4 py-2 text-sm btn-glass-primary rounded-xl hover:opacity-90">
               編集
             </button>
           </div>
@@ -153,7 +153,7 @@ export default function TemplatesPage() {
           </div>
 
           {/* 事前質問一覧 (FR-060, FR-061) */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-3">事前質問</h2>
             {(() => {
               let questions: PreQuestion[] = [];
@@ -182,20 +182,20 @@ export default function TemplatesPage() {
             { label: "リスク検知プロンプト", value: t.riskDetectionPrompt },
             { label: "言い換え用プロンプト", value: t.rephrasingPrompt },
           ].map(({ label, value }) => (
-            <section key={label} className="bg-card border border-border rounded-lg p-4">
+            <section key={label} className="bg-card border border-border rounded-2xl p-4">
               <h2 className="font-semibold mb-2">{label}</h2>
               <p className="text-sm whitespace-pre-wrap">{value || "（未設定）"}</p>
             </section>
           ))}
 
           {/* デフォルトトーン (FR-069) */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-2">デフォルトトーン</h2>
             <span className="text-sm">{toneLabels[t.defaultTone] ?? t.defaultTone}</span>
           </section>
 
           {/* テンプレ履歴 (FR-093) */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-3">バージョン履歴</h2>
             {versions.data && versions.data.length > 0 ? (
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -224,16 +224,16 @@ export default function TemplatesPage() {
       {editing && (
         <div className="space-y-6">
           <div className="flex justify-end gap-2">
-            <button onClick={() => setEditing(false)} className="px-4 py-2 text-sm border border-input rounded-md hover:bg-accent">
+            <button onClick={() => setEditing(false)} className="px-4 py-2 text-sm border border-white/50 rounded-xl bg-white/30 hover:bg-white/50">
               キャンセル
             </button>
-            <button onClick={handleSave} disabled={updateTemplate.isPending} className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50">
+            <button onClick={handleSave} disabled={updateTemplate.isPending} className="px-4 py-2 text-sm btn-glass-primary rounded-xl hover:opacity-90 disabled:opacity-50">
               {updateTemplate.isPending ? "保存中..." : "保存"}
             </button>
           </div>
 
           {/* 事前質問編集 (FR-060~063) */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold">事前質問</h2>
               <button onClick={addQuestion} className="text-sm text-primary hover:underline">+ 質問追加</button>
@@ -270,7 +270,7 @@ export default function TemplatesPage() {
             { key: "riskDetectionPrompt", label: "リスク検知プロンプト" },
             { key: "rephrasingPrompt", label: "言い換え用プロンプト" },
           ] as const).map(({ key, label }) => (
-            <section key={key} className="bg-card border border-border rounded-lg p-4">
+            <section key={key} className="bg-card border border-border rounded-2xl p-4">
               <h2 className="font-semibold mb-2">{label}</h2>
               <textarea
                 value={(form as any)[key]}
@@ -282,7 +282,7 @@ export default function TemplatesPage() {
           ))}
 
           {/* デフォルトトーン */}
-          <section className="bg-card border border-border rounded-lg p-4">
+          <section className="bg-card border border-border rounded-2xl p-4">
             <h2 className="font-semibold mb-2">デフォルトトーン</h2>
             <div className="flex gap-3">
               {(["POLITE", "NEUTRAL", "STRONG"] as const).map((tone) => (

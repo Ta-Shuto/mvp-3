@@ -47,7 +47,7 @@ function DataRetentionSettings() {
   };
 
   return (
-    <section className="bg-card border border-border rounded-lg p-5 space-y-4">
+    <section className="bg-card border border-border rounded-2xl p-5 space-y-4">
       <h2 className="font-semibold text-lg">データ保持・自動削除設定</h2>
       <p className="text-sm text-muted-foreground">
         保持期間を過ぎた案件データを自動的に削除します。削除ログは監査用に保持されます。
@@ -57,7 +57,7 @@ function DataRetentionSettings() {
         <div
           onClick={() => setAutoDeleteEnabled(!autoDeleteEnabled)}
           className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
-            autoDeleteEnabled ? "bg-primary" : "bg-gray-300"
+            autoDeleteEnabled ? "bg-indigo-500" : "bg-white/40"
           }`}
         >
           <div
@@ -78,7 +78,7 @@ function DataRetentionSettings() {
             value={retentionMonths}
             onChange={(e) => setRetentionMonths(Number(e.target.value))}
             disabled={!autoDeleteEnabled}
-            className="w-24 px-3 py-2 border border-border rounded-lg bg-background text-sm disabled:opacity-50"
+            className="w-24 px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm disabled:opacity-50"
           />
           <span className="text-sm text-muted-foreground">ヶ月（{Math.floor(retentionMonths / 12)}年）</span>
         </div>
@@ -113,7 +113,7 @@ function DataRetentionSettings() {
       <button
         onClick={handleSave}
         disabled={updateSettings.isPending}
-        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
       >
         {updateSettings.isPending ? "保存中..." : "ポリシーを保存"}
       </button>
@@ -153,7 +153,7 @@ function AutoEndSettings() {
   };
 
   return (
-    <section className="bg-card border border-border rounded-lg p-5 space-y-4">
+    <section className="bg-card border border-border rounded-2xl p-5 space-y-4">
       <h2 className="font-semibold text-lg">自動終了条件</h2>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
@@ -163,7 +163,7 @@ function AutoEndSettings() {
             min={1}
             value={autoEndSettings.silenceMinutes}
             onChange={(e) => setAutoEndSettings((s) => ({ ...s, silenceMinutes: Number(e.target.value) }))}
-            className="w-20 px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            className="w-20 px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
           />
           <span className="text-sm text-muted-foreground">分</span>
         </div>
@@ -183,7 +183,7 @@ function AutoEndSettings() {
             min={1}
             value={autoEndSettings.maxDurationHours}
             onChange={(e) => setAutoEndSettings((s) => ({ ...s, maxDurationHours: Number(e.target.value) }))}
-            className="w-20 px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            className="w-20 px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
           />
           <span className="text-sm text-muted-foreground">時間</span>
         </div>
@@ -191,7 +191,7 @@ function AutoEndSettings() {
       <button
         onClick={handleSave}
         disabled={updateSettings.isPending}
-        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
       >
         {updateSettings.isPending ? "保存中..." : "保存"}
       </button>
@@ -218,7 +218,7 @@ function MeetingUrlSettings() {
   };
 
   return (
-    <section className="bg-card border border-border rounded-lg p-5 space-y-3">
+    <section className="bg-card border border-border rounded-2xl p-5 space-y-3">
       <h2 className="font-semibold text-lg">会議URL再利用ルール</h2>
       <div className="flex gap-4">
         <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -241,7 +241,7 @@ function MeetingUrlSettings() {
       <button
         onClick={handleSave}
         disabled={updateSettings.isPending}
-        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
       >
         {updateSettings.isPending ? "保存中..." : "保存"}
       </button>
@@ -251,18 +251,18 @@ function MeetingUrlSettings() {
 
 function ScriptTemplateManagement() {
   return (
-    <section className="bg-card border border-border rounded-lg p-5 space-y-4">
+    <section className="bg-card border border-border rounded-2xl p-5 space-y-4">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="font-semibold text-lg">台本テンプレート管理</h2>
           <p className="text-sm text-muted-foreground">テンプレートのバージョン管理</p>
         </div>
-        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-accent transition-colors">
+        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-white/40 transition-colors">
           + 新規テンプレート
         </button>
       </div>
 
-      <div className="bg-muted/50 rounded-lg p-8 text-center">
+      <div className="bg-white/20 rounded-lg p-8 text-center">
         <p className="text-muted-foreground text-sm">テンプレートがまだ作成されていません</p>
       </div>
     </section>

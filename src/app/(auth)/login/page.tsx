@@ -31,16 +31,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg border border-border shadow-sm">
+    <div className="min-h-screen flex items-center justify-center glass-bg">
+      <div className="w-full max-w-md p-8 space-y-6 bg-card border border-border rounded-2xl shadow-xl">
         <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20">
+              IS
+            </div>
+          </div>
           <h1 className="text-2xl font-bold text-foreground">面談支援プラットフォーム</h1>
           <p className="text-muted-foreground mt-2">ログイン</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-xl">
               {error}
             </div>
           )}
@@ -55,7 +60,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-3 py-2.5 border border-white/50 rounded-xl bg-white/30 text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
               placeholder="email@example.com"
             />
           </div>
@@ -70,14 +75,14 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-3 py-2.5 border border-white/50 rounded-xl bg-white/30 text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="w-full py-2.5 px-4 btn-glass-primary rounded-xl font-medium disabled:opacity-50 transition-all"
           >
             {loading ? "ログイン中..." : "ログイン"}
           </button>
