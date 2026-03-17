@@ -1,10 +1,9 @@
 import { PrismaClient } from "../src/generated/prisma";
-import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/interview_support";
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/interview_support",
+});
 
 async function main() {
   // Create demo organization
