@@ -318,25 +318,7 @@ export default function CaseDetailPage() {
 
             {/* 担当者・参考案件 */}
             <div className="space-y-6">
-              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
-                <h2 className="font-semibold">担当者</h2>
-                <div className="space-y-2">
-                  {c.assignments.map((a: any) => (
-                    <div key={a.id} className="flex items-center gap-2 text-sm">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
-                        {a.user.name?.[0] ?? "?"}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{a.user.name}</p>
-                        <p className="text-xs text-muted-foreground">{a.user.email}</p>
-                      </div>
-                      {c.primaryAssigneeId === a.userId && (
-                        <span className="text-xs px-1.5 py-0.5 bg-primary text-primary-foreground rounded ml-auto">主担当</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <AssigneePanel caseId={id} assignments={c.assignments} primaryAssigneeId={c.primaryAssigneeId} />
 
               <div className="bg-card border border-border rounded-lg p-5 space-y-3">
                 <h2 className="font-semibold">参考案件</h2>
@@ -438,6 +420,130 @@ export default function CaseDetailPage() {
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">{c.reportContent}</p>
             </section>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AssigneePanel({
+  caseId,
+  assignments,
+  primaryAssigneeId,
+}: {
+  caseId: string;
+  assignments: any[];
+  primaryAssigneeId: string | null;
+}) {
+  const utils = trpc.useUtils();
+  const [showAdd, setShowAdd] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+
+  const users = trpc.user.list.useQuery(undefined, { enabled: showAdd });
+  const updateAssignees = trpc.case.updateAssignees.useMutation({
+    onSuccess: () => utils.case.getById.invalidate({ id: caseId }),
+  });
+
+  const currentAssigneeIds = assignments.map((a: any) => a.userId);
+
+  const handleAdd = () => {
+    if (!selectedUserId) return;
+    const newAssigneeIds = [...currentAssigneeIds, selectedUserId];
+    updateAssignees.mutate({
+      id: caseId,
+      assigneeIds: newAssigneeIds,
+      primaryAssigneeId: primaryAssigneeId ?? undefined,
+    });
+    setSelectedUserId("");
+    setShowAdd(false);
+  };
+
+  const handleRemove = (userId: string) => {
+    if (!confirm("この担当者を外しますか？")) return;
+    const newAssigneeIds = currentAssigneeIds.filter((id: string) => id !== userId);
+    const newPrimary = primaryAssigneeId === userId ? (newAssigneeIds[0] ?? undefined) : (primaryAssigneeId ?? undefined);
+    updateAssignees.mutate({
+      id: caseId,
+      assigneeIds: newAssigneeIds,
+      primaryAssigneeId: newPrimary,
+    });
+  };
+
+  const handleSetPrimary = (userId: string) => {
+    updateAssignees.mutate({
+      id: caseId,
+      assigneeIds: currentAssigneeIds,
+      primaryAssigneeId: userId,
+    });
+  };
+
+  const availableUsers = (users.data as any[])?.filter(
+    (u: any) => !currentAssigneeIds.includes(u.id)
+  ) ?? [];
+
+  return (
+    <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+      <div className="flex justify-between items-center">
+        <h2 className="font-semibold">担当者</h2>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          className="text-xs text-primary hover:underline"
+        >
+          {showAdd ? "閉じる" : "+ 追加"}
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        {assignments.map((a: any) => (
+          <div key={a.id} className="flex items-center gap-2 text-sm group">
+            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+              {a.user.name?.[0] ?? "?"}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{a.user.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{a.user.email}</p>
+            </div>
+            {primaryAssigneeId === a.userId ? (
+              <span className="text-xs px-1.5 py-0.5 bg-primary text-primary-foreground rounded shrink-0">主担当</span>
+            ) : (
+              <div className="hidden group-hover:flex gap-1 shrink-0">
+                <button
+                  onClick={() => handleSetPrimary(a.userId)}
+                  className="text-xs text-primary hover:underline"
+                >
+                  主担当に
+                </button>
+                <button
+                  onClick={() => handleRemove(a.userId)}
+                  className="text-xs text-destructive hover:underline"
+                >
+                  外す
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {showAdd && (
+        <div className="flex gap-2 pt-2 border-t border-border">
+          <select
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+            className="flex-1 px-2 py-1.5 text-sm border border-border rounded-lg bg-background"
+          >
+            <option value="">ユーザーを選択</option>
+            {availableUsers.map((u: any) => (
+              <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+            ))}
+          </select>
+          <button
+            onClick={handleAdd}
+            disabled={!selectedUserId || updateAssignees.isPending}
+            className="px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
+          >
+            追加
+          </button>
         </div>
       )}
     </div>
