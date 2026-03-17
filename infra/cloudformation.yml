@@ -387,6 +387,7 @@ Resources:
       ContainerDefinitions:
         - Name: web
           Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NextJSRepo}:latest"
+          Command: ["node", "server.js"]
           PortMappings:
             - ContainerPort: 3000
               Protocol: tcp
@@ -424,6 +425,7 @@ Resources:
             Interval: 30
             Timeout: 5
             Retries: 3
+            StartPeriod: 60
 
   WSServerTaskDefinition:
     Type: AWS::ECS::TaskDefinition
