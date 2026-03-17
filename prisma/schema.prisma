@@ -66,6 +66,27 @@ enum MeetingEndReason {
   MAX_DURATION
 }
 
+enum CaseCategory {
+  HARASSMENT
+  FRAUD
+  SAFETY
+  OTHER
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum IntakeChannel {
+  EMAIL
+  PHONE
+  WEB_FORM
+  IN_PERSON
+}
+
 // ========== Models ==========
 
 model Organization {
@@ -151,25 +172,30 @@ model TemplateVersion {
 }
 
 model Case {
-  id                String       @id @default(cuid())
+  id                String        @id @default(cuid())
   organizationId    String
   useCase           UseCase
   meetingUrl        String?
   scheduledAt       DateTime?
-  status            CaseStatus   @default(PRE_INPUT_PENDING)
-  progress          CaseProgress @default(RECEPTION)
+  status            CaseStatus    @default(PRE_INPUT_PENDING)
+  progress          CaseProgress  @default(RECEPTION)
   nextTask          String?
   deadline          DateTime?
   primaryAssigneeId String?
   category          String?
-  issue             String?      @db.Text
-  conclusion        String?      @db.Text
-  action            String?      @db.Text
+  caseCategory      CaseCategory?
+  riskLevel         RiskLevel?
+  intakeChannel     IntakeChannel?
+  reportContent     String?       @db.Text
+  caseName          String?
+  issue             String?       @db.Text
+  conclusion        String?       @db.Text
+  action            String?       @db.Text
   referencePoint    String?
   templateSnapshot  Json?
   closedAt          DateTime?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   organization     Organization      @relation(fields: [organizationId], references: [id])
   primaryAssignee  User?             @relation("PrimaryAssignee", fields: [primaryAssigneeId], references: [id])

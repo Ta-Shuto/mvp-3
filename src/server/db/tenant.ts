@@ -39,6 +39,11 @@ export function getTenantDb(organizationId: string) {
           ...args,
           where: { ...args?.where, organizationId },
         }),
+      count: (args?: any) =>
+        prisma.user.count({
+          ...args,
+          where: { ...args?.where, organizationId },
+        }),
     },
     template: {
       findFirst: (args?: any) =>
