@@ -95,6 +95,7 @@ model User {
   name           String
   email          String   @unique
   passwordHash   String?
+  department     String?
   caseViewScope  String   @default("assigned")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

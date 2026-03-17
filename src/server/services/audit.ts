@@ -44,4 +44,5 @@ export const AuditEventTypes = {
   EXPORT_DOWNLOADED: "export_downloaded",
   LOGIN: "login",
   LOGOUT: "logout",
+  USER_INVITED: "user_invited",
 } as const;
