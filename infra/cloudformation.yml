@@ -414,6 +414,10 @@ Resources:
               Value: !Ref AWS::Region
             - Name: WS_SERVER_URL
               Value: !Sub "http://ws-service.${Environment}-interview.local:3001"
+            - Name: HOSTNAME
+              Value: "0.0.0.0"
+            - Name: PORT
+              Value: "3000"
           LogConfiguration:
             LogDriver: awslogs
             Options:
