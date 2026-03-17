@@ -395,7 +395,7 @@ Resources:
       ContainerDefinitions:
         - Name: web
           Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NextJSRepo}:latest"
-          Command: ["node", "server.js"]
+          Command: ["sh", "docker-entrypoint.sh"]
           PortMappings:
             - ContainerPort: 3000
               Protocol: tcp
@@ -403,7 +403,7 @@ Resources:
             - Name: NODE_ENV
               Value: production
             - Name: DATABASE_URL
-              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?uselibpqcompat=true&sslmode=require"
+              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=no-verify"
             - Name: REDIS_URL
               Value: !Sub "redis://${RedisCluster.RedisEndpoint.Address}:${RedisCluster.RedisEndpoint.Port}"
             - Name: NEXTAUTH_URL
@@ -461,7 +461,7 @@ Resources:
             - Name: WS_SERVER_PORT
               Value: "3001"
             - Name: DATABASE_URL
-              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?uselibpqcompat=true&sslmode=require"
+              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=no-verify"
             - Name: ANTHROPIC_API_KEY
               Value: !Ref AnthropicApiKey
           LogConfiguration:
@@ -591,6 +591,7 @@ Resources:
       TaskDefinition: !Ref NextJSTaskDefinition
       DesiredCount: 0
       LaunchType: FARGATE
+      HealthCheckGracePeriodSeconds: 120
       NetworkConfiguration:
         AwsvpcConfiguration:
           SecurityGroups:
