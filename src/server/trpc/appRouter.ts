@@ -7,6 +7,7 @@ import { meetingRouter } from "./routers/meeting";
 import { auditLogRouter } from "./routers/auditLog";
 import { scriptGenerationRouter } from "./routers/scriptGeneration";
 import { userRouter } from "./routers/user";
+import { orgSettingsRouter } from "./routers/orgSettings";
 
 export const appRouter = router({
   dashboard: dashboardRouter,
@@ -17,6 +18,7 @@ export const appRouter = router({
   auditLog: auditLogRouter,
   scriptGeneration: scriptGenerationRouter,
   user: userRouter,
+  orgSettings: orgSettingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

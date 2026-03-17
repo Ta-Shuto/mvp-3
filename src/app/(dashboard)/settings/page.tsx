@@ -1,5 +1,6 @@
 "use client";
 
+import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 
 export default function SettingsPage() {
@@ -7,26 +8,42 @@ export default function SettingsPage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">設定</h1>
       <DataRetentionSettings />
-      <ScriptTemplateManagement />
       <AutoEndSettings />
       <MeetingUrlSettings />
+      <ScriptTemplateManagement />
     </div>
   );
 }
 
 function DataRetentionSettings() {
+  const settings = trpc.orgSettings.get.useQuery();
+  const updateSettings = trpc.orgSettings.update.useMutation({
+    onSuccess: () => settings.refetch(),
+  });
+
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(false);
   const [retentionMonths, setRetentionMonths] = useState(36);
   const [targetStatuses, setTargetStatuses] = useState({
     closed: true,
     resolved: false,
   });
-  const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
-    setSaving(true);
-    // TODO: Connect to tRPC endpoint
-    setTimeout(() => setSaving(false), 500);
+  useEffect(() => {
+    if (settings.data) {
+      setRetentionMonths(Math.round((settings.data.retentionDays ?? 365) / 30));
+    }
+  }, [settings.data]);
+
+  const handleSave = () => {
+    updateSettings.mutate({
+      retentionDays: retentionMonths * 30,
+      autoDeleteEnabled,
+      autoDeleteRetentionMonths: retentionMonths,
+      autoDeleteTargetStatuses: [
+        ...(targetStatuses.closed ? ["CLOSED"] : []),
+        ...(targetStatuses.resolved ? ["COMPLETED"] : []),
+      ],
+    });
   };
 
   return (
@@ -39,7 +56,7 @@ function DataRetentionSettings() {
       <label className="flex items-center gap-3 cursor-pointer">
         <div
           onClick={() => setAutoDeleteEnabled(!autoDeleteEnabled)}
-          className={`relative w-11 h-6 rounded-full transition-colors ${
+          className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${
             autoDeleteEnabled ? "bg-primary" : "bg-gray-300"
           }`}
         >
@@ -88,51 +105,51 @@ function DataRetentionSettings() {
               disabled={!autoDeleteEnabled}
               className="rounded"
             />
-            解決済み（RESOLVED）
+            解決済み（COMPLETED）
           </label>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          選択したステータスの案件のみ自動削除の対象になります
-        </p>
       </div>
 
       <button
         onClick={handleSave}
-        disabled={saving}
+        disabled={updateSettings.isPending}
         className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
       >
-        {saving ? "保存中..." : "ポリシーを保存"}
+        {updateSettings.isPending ? "保存中..." : "ポリシーを保存"}
       </button>
-    </section>
-  );
-}
-
-function ScriptTemplateManagement() {
-  return (
-    <section className="bg-card border border-border rounded-lg p-5 space-y-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="font-semibold text-lg">台本テンプレート管理</h2>
-          <p className="text-sm text-muted-foreground">テンプレートのバージョン管理</p>
-        </div>
-        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-accent transition-colors">
-          + 新規テンプレート
-        </button>
-      </div>
-
-      <div className="bg-muted/50 rounded-lg p-8 text-center">
-        <p className="text-muted-foreground text-sm">テンプレートがまだ作成されていません</p>
-      </div>
+      {updateSettings.isSuccess && (
+        <span className="text-sm text-green-600 ml-3">保存しました</span>
+      )}
     </section>
   );
 }
 
 function AutoEndSettings() {
+  const settings = trpc.orgSettings.get.useQuery();
+  const updateSettings = trpc.orgSettings.update.useMutation({
+    onSuccess: () => settings.refetch(),
+  });
+
   const [autoEndSettings, setAutoEndSettings] = useState({
     silenceMinutes: 10,
     endOnNoParticipants: true,
     maxDurationHours: 3,
   });
+
+  useEffect(() => {
+    if (settings.data?.autoEndSettings) {
+      const s = settings.data.autoEndSettings as any;
+      setAutoEndSettings({
+        silenceMinutes: s.silenceMinutes ?? 10,
+        endOnNoParticipants: s.endOnNoParticipants ?? true,
+        maxDurationHours: s.maxDurationHours ?? 3,
+      });
+    }
+  }, [settings.data]);
+
+  const handleSave = () => {
+    updateSettings.mutate({ autoEndSettings });
+  };
 
   return (
     <section className="bg-card border border-border rounded-lg p-5 space-y-4">
@@ -170,12 +187,34 @@ function AutoEndSettings() {
           <span className="text-sm text-muted-foreground">時間</span>
         </div>
       </div>
+      <button
+        onClick={handleSave}
+        disabled={updateSettings.isPending}
+        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+      >
+        {updateSettings.isPending ? "保存中..." : "保存"}
+      </button>
     </section>
   );
 }
 
 function MeetingUrlSettings() {
-  const [meetingUrlReuseRule, setMeetingUrlReuseRule] = useState("new_case");
+  const settings = trpc.orgSettings.get.useQuery();
+  const updateSettings = trpc.orgSettings.update.useMutation({
+    onSuccess: () => settings.refetch(),
+  });
+
+  const [rule, setRule] = useState("new_case");
+
+  useEffect(() => {
+    if (settings.data?.meetingUrlReuseRule) {
+      setRule(settings.data.meetingUrlReuseRule);
+    }
+  }, [settings.data]);
+
+  const handleSave = () => {
+    updateSettings.mutate({ meetingUrlReuseRule: rule as any });
+  };
 
   return (
     <section className="bg-card border border-border rounded-lg p-5 space-y-3">
@@ -184,19 +223,46 @@ function MeetingUrlSettings() {
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="radio"
-            checked={meetingUrlReuseRule === "new_case"}
-            onChange={() => setMeetingUrlReuseRule("new_case")}
+            checked={rule === "new_case"}
+            onChange={() => setRule("new_case")}
           />
           毎回新規案件作成
         </label>
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="radio"
-            checked={meetingUrlReuseRule === "append"}
-            onChange={() => setMeetingUrlReuseRule("append")}
+            checked={rule === "append"}
+            onChange={() => setRule("append")}
           />
           既存案件に追加
         </label>
+      </div>
+      <button
+        onClick={handleSave}
+        disabled={updateSettings.isPending}
+        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+      >
+        {updateSettings.isPending ? "保存中..." : "保存"}
+      </button>
+    </section>
+  );
+}
+
+function ScriptTemplateManagement() {
+  return (
+    <section className="bg-card border border-border rounded-lg p-5 space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="font-semibold text-lg">台本テンプレート管理</h2>
+          <p className="text-sm text-muted-foreground">テンプレートのバージョン管理</p>
+        </div>
+        <button className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-accent transition-colors">
+          + 新規テンプレート
+        </button>
+      </div>
+
+      <div className="bg-muted/50 rounded-lg p-8 text-center">
+        <p className="text-muted-foreground text-sm">テンプレートがまだ作成されていません</p>
       </div>
     </section>
   );

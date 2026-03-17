@@ -26,10 +26,42 @@ const statusLabels: Record<string, string> = {
   CLOSED: "クローズ",
 };
 
+const statusColors: Record<string, string> = {
+  PRE_INPUT_PENDING: "bg-yellow-100 text-yellow-700",
+  PRE_INPUT_SUBMITTED: "bg-blue-100 text-blue-700",
+  IN_MEETING: "bg-green-100 text-green-700",
+  MEETING_ENDED: "bg-gray-100 text-gray-600",
+  CLOSED: "bg-gray-200 text-gray-500",
+};
+
+const categoryLabels: Record<string, string> = {
+  HARASSMENT: "ハラスメント",
+  FRAUD: "不正",
+  SAFETY: "安全衛生",
+  OTHER: "その他",
+};
+
+const riskColors: Record<string, string> = {
+  URGENT: "bg-red-100 text-red-700",
+  HIGH: "bg-orange-100 text-orange-700",
+  MEDIUM: "bg-yellow-100 text-yellow-700",
+  LOW: "bg-green-100 text-green-700",
+};
+
+const riskLabels: Record<string, string> = {
+  URGENT: "緊急",
+  HIGH: "高",
+  MEDIUM: "中",
+  LOW: "低",
+};
+
+type Tab = "overview" | "meeting" | "review" | "script";
+
 export default function CaseDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const utils = trpc.useUtils();
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   const caseData = trpc.case.getById.useQuery({ id });
   const updateProgress = trpc.case.updateProgress.useMutation({
@@ -39,6 +71,9 @@ export default function CaseDetailPage() {
     onSuccess: () => utils.case.getById.invalidate({ id }),
   });
   const updateSummary = trpc.case.updateSummary.useMutation({
+    onSuccess: () => utils.case.getById.invalidate({ id }),
+  });
+  const closeCase = trpc.case.close.useMutation({
     onSuccess: () => utils.case.getById.invalidate({ id }),
   });
 
@@ -52,245 +87,359 @@ export default function CaseDetailPage() {
   });
 
   if (caseData.isLoading) {
-    return <p className="text-muted-foreground">読み込み中...</p>;
+    return <p className="text-muted-foreground p-8">読み込み中...</p>;
   }
 
   if (!caseData.data) {
-    return <p className="text-destructive">案件が見つかりません</p>;
+    return <p className="text-destructive p-8">案件が見つかりません</p>;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const c = caseData.data as any;
 
+  const tabs: { key: Tab; label: string; href?: string }[] = [
+    { key: "overview", label: "概要" },
+    { key: "meeting", label: "面談支援", href: `/cases/${id}/meeting` },
+    { key: "review", label: "レビュー", href: `/cases/${id}/review` },
+    { key: "script", label: "台本生成", href: `/cases/${id}/script` },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/cases" className="text-muted-foreground hover:text-foreground text-sm">
-          &larr; 案件一覧
-        </Link>
-        <h1 className="text-2xl font-bold">{c.category ?? `案件 ${c.id.slice(0, 8)}`}</h1>
-        <span className="px-2 py-0.5 text-xs rounded bg-secondary">
-          {statusLabels[c.status] ?? c.status}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 基本情報 */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h2 className="font-semibold">基本情報</h2>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <span className="text-muted-foreground">案件ID:</span>
-            <span>{c.id}</span>
-            <span className="text-muted-foreground">ユースケース:</span>
-            <span>{c.useCase === "VOLUNTARY_RETIREMENT" ? "希望退職" : "監査室"}</span>
-            <span className="text-muted-foreground">会議URL:</span>
-            <span className="truncate">{c.meetingUrl ?? "—"}</span>
-            <span className="text-muted-foreground">開始予定:</span>
-            <span>{c.scheduledAt ? new Date(c.scheduledAt).toLocaleString("ja-JP") : "—"}</span>
-            <span className="text-muted-foreground">作成日:</span>
-            <span>{new Date(c.createdAt).toLocaleString("ja-JP")}</span>
-          </div>
-
-          {/* 事前チャットURL */}
-          {c.preChat && (
-            <div className="mt-4 p-3 bg-muted rounded-md">
-              <p className="text-sm font-medium">事前チャットURL</p>
-              <code className="text-xs break-all">
-                {typeof window !== "undefined" ? window.location.origin : ""}/pre-chat/{c.preChat.token}
-              </code>
-              <p className="text-xs text-muted-foreground mt-1">
-                提出状態: {c.preChat.isSubmitted ? "提出済" : "未提出"}
-              </p>
+      {/* ヘッダー */}
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/cases" className="text-muted-foreground hover:text-foreground text-sm">
+            &larr; 一覧
+          </Link>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">
+                {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
+              </h1>
+              <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${statusColors[c.status] ?? "bg-secondary"}`}>
+                {statusLabels[c.status] ?? c.status}
+              </span>
+              {c.riskLevel && (
+                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${riskColors[c.riskLevel]}`}>
+                  リスク: {riskLabels[c.riskLevel]}
+                </span>
+              )}
+              {c.caseCategory && (
+                <span className="px-2 py-0.5 text-xs rounded-full bg-secondary font-medium">
+                  {categoryLabels[c.caseCategory] ?? c.caseCategory}
+                </span>
+              )}
             </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              作成: {new Date(c.createdAt).toLocaleDateString("ja-JP")} /
+              担当: {c.primaryAssignee?.name ?? "未割当"}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          {c.status !== "CLOSED" && (
+            <button
+              onClick={() => {
+                if (confirm("この案件をクローズしますか？")) {
+                  closeCase.mutate({ id });
+                }
+              }}
+              className="px-3 py-1.5 text-sm border border-destructive text-destructive rounded-lg hover:bg-destructive/10"
+            >
+              案件クローズ
+            </button>
           )}
         </div>
+      </div>
 
-        {/* FR-104: 進捗ステータス */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h2 className="font-semibold">進捗ステータス</h2>
-          <div className="flex flex-wrap gap-2">
-            {progressOptions.map(([key, label]) => (
+      {/* タブナビゲーション */}
+      <div className="border-b border-border">
+        <div className="flex gap-1">
+          {tabs.map((tab) => (
+            tab.href && tab.key !== "overview" ? (
+              <Link
+                key={tab.key}
+                href={tab.href}
+                className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-border transition-colors"
+              >
+                {tab.label}
+              </Link>
+            ) : (
               <button
-                key={key}
-                onClick={() => updateProgress.mutate({ id, progress: key as Parameters<typeof updateProgress.mutate>[0]["progress"] })}
-                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                  c.progress === key
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "border-border hover:bg-accent"
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.key
+                    ? "text-primary border-primary"
+                    : "text-muted-foreground hover:text-foreground border-transparent hover:border-border"
                 }`}
               >
-                {label}
+                {tab.label}
               </button>
-            ))}
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* 概要タブ */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          {/* 進捗ステップ */}
+          <section className="bg-card border border-border rounded-lg p-5">
+            <h2 className="font-semibold mb-4">進捗ステータス</h2>
+            <div className="flex items-center gap-1">
+              {progressOptions.map(([key, label], i) => {
+                const currentIdx = progressOptions.findIndex(([k]) => k === c.progress);
+                const isCompleted = i < currentIdx;
+                const isCurrent = i === currentIdx;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => updateProgress.mutate({ id, progress: key as any })}
+                    className={`flex-1 py-2 text-xs rounded-md border transition-all ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground border-primary font-bold"
+                        : isCompleted
+                        ? "bg-primary/20 text-primary border-primary/30"
+                        : "border-border text-muted-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 基本情報 */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+              <h2 className="font-semibold">基本情報</h2>
+              <dl className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">案件ID</dt>
+                  <dd className="font-mono text-xs">{c.id.slice(0, 12)}...</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">ユースケース</dt>
+                  <dd>{c.useCase === "VOLUNTARY_RETIREMENT" ? "希望退職" : "監査室"}</dd>
+                </div>
+                {c.intakeChannel && (
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">受付チャネル</dt>
+                    <dd>{c.intakeChannel}</dd>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">会議URL</dt>
+                  <dd className="truncate max-w-32">{c.meetingUrl ?? "—"}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">面談数</dt>
+                  <dd>{c.meetings?.length ?? 0}件</dd>
+                </div>
+              </dl>
+
+              {/* 事前チャットURL */}
+              {c.preChat && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs font-medium mb-1">事前チャットURL</p>
+                  <code className="text-xs break-all text-muted-foreground">
+                    {typeof window !== "undefined" ? window.location.origin : ""}/pre-chat/{c.preChat.token}
+                  </code>
+                  <p className="text-xs mt-1">
+                    <span className={`px-1.5 py-0.5 rounded ${c.preChat.isSubmitted ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                      {c.preChat.isSubmitted ? "提出済" : "未提出"}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 次の作業・期限 */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-4">
+              <h2 className="font-semibold">次の作業・期限</h2>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs text-muted-foreground">作業内容</label>
+                  <input
+                    type="text"
+                    placeholder="次の作業を入力..."
+                    defaultValue={c.nextTask ?? ""}
+                    onBlur={(e) => {
+                      if (e.target.value !== (c.nextTask ?? "")) {
+                        updateNextTask.mutate({ id, nextTask: e.target.value });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">期限</label>
+                  <input
+                    type="date"
+                    defaultValue={c.deadline ? new Date(c.deadline).toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        updateNextTask.mutate({ id, deadline: new Date(e.target.value).toISOString() });
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                  />
+                </div>
+                {c.deadline && (
+                  <p className={`text-xs ${new Date(c.deadline) < new Date() ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+                    {new Date(c.deadline) < new Date() ? "期限超過" : `残り ${Math.ceil((new Date(c.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}日`}
+                  </p>
+                )}
+              </div>
+
+              {/* 進捗履歴 */}
+              {c.progressHistory.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-muted-foreground mb-2">進捗履歴</h3>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {c.progressHistory.map((h: any) => (
+                      <div key={h.id} className="text-xs text-muted-foreground flex gap-2">
+                        <span className="whitespace-nowrap">
+                          {new Date(h.createdAt).toLocaleDateString("ja-JP")}
+                        </span>
+                        <span>
+                          {progressLabels[h.previousValue]} → {progressLabels[h.currentValue]}
+                        </span>
+                        <span className="text-primary">{h.updatedBy.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 担当者・参考案件 */}
+            <div className="space-y-6">
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <h2 className="font-semibold">担当者</h2>
+                <div className="space-y-2">
+                  {c.assignments.map((a: any) => (
+                    <div key={a.id} className="flex items-center gap-2 text-sm">
+                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                        {a.user.name?.[0] ?? "?"}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{a.user.name}</p>
+                        <p className="text-xs text-muted-foreground">{a.user.email}</p>
+                      </div>
+                      {c.primaryAssigneeId === a.userId && (
+                        <span className="text-xs px-1.5 py-0.5 bg-primary text-primary-foreground rounded ml-auto">主担当</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+                <h2 className="font-semibold">参考案件</h2>
+                {c.referencesFrom.length > 0 ? (
+                  <div className="space-y-2">
+                    {c.referencesFrom.map((ref: any) => (
+                      <Link
+                        key={ref.id}
+                        href={`/cases/${ref.toCaseId}`}
+                        className="block p-2 border border-border rounded-lg hover:bg-accent text-sm"
+                      >
+                        <span className="font-medium">{ref.toCase.category ?? ref.toCaseId.slice(0, 8)}</span>
+                        <p className="text-xs text-muted-foreground mt-1">{ref.reason}</p>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">参考案件はありません</p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* FR-105: 次の作業・期限 */}
-          <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-medium">次の作業・期限</h3>
-            <input
-              type="text"
-              placeholder="次の作業..."
-              defaultValue={c.nextTask ?? ""}
-              onBlur={(e) => {
-                if (e.target.value !== (c.nextTask ?? "")) {
-                  updateNextTask.mutate({ id, nextTask: e.target.value });
-                }
-              }}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
-            />
-            <input
-              type="date"
-              defaultValue={c.deadline ? new Date(c.deadline).toISOString().split("T")[0] : ""}
-              onChange={(e) => {
-                if (e.target.value) {
-                  updateNextTask.mutate({ id, deadline: new Date(e.target.value).toISOString() });
-                }
-              }}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
-            />
-          </div>
+          {/* 案件サマリー */}
+          <section className="bg-card border border-border rounded-lg p-5 space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="font-semibold">案件サマリー</h2>
+              <button
+                onClick={() => {
+                  if (editingSummary) {
+                    updateSummary.mutate({ id, ...summaryForm });
+                  } else {
+                    setSummaryForm({
+                      category: c.category ?? "",
+                      issue: c.issue ?? "",
+                      conclusion: c.conclusion ?? "",
+                      action: c.action ?? "",
+                      referencePoint: c.referencePoint ?? "",
+                    });
+                  }
+                  setEditingSummary(!editingSummary);
+                }}
+                className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
+              >
+                {editingSummary ? "保存" : "編集"}
+              </button>
+            </div>
 
-          {/* 進捗履歴 */}
-          {c.progressHistory.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium mb-2">進捗履歴</h3>
-              <div className="space-y-1 max-h-32 overflow-y-auto">
-                {c.progressHistory.map((h: any) => (
-                  <div key={h.id} className="text-xs text-muted-foreground">
-                    {progressLabels[h.previousValue]} → {progressLabels[h.currentValue]}
-                    <span className="ml-2">{h.updatedBy.name}</span>
-                    <span className="ml-2">{new Date(h.createdAt).toLocaleString("ja-JP")}</span>
+            {editingSummary ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { key: "category", label: "事象カテゴリ", type: "input" },
+                  { key: "referencePoint", label: "参考になるポイント", type: "input" },
+                  { key: "issue", label: "争点（論点）", type: "textarea" },
+                  { key: "conclusion", label: "結論", type: "textarea" },
+                  { key: "action", label: "対応（実施したこと）", type: "textarea" },
+                ].map(({ key, label, type }) => (
+                  <div key={key} className={type === "textarea" ? "" : ""}>
+                    <label className="text-xs text-muted-foreground font-medium">{label}</label>
+                    {type === "textarea" ? (
+                      <textarea
+                        value={(summaryForm as any)[key]}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, [key]: e.target.value }))}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                        rows={3}
+                      />
+                    ) : (
+                      <input
+                        value={(summaryForm as any)[key]}
+                        onChange={(e) => setSummaryForm((f) => ({ ...f, [key]: e.target.value }))}
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                      />
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {[
+                  { label: "事象カテゴリ", value: c.category },
+                  { label: "参考ポイント", value: c.referencePoint },
+                  { label: "争点", value: c.issue },
+                  { label: "結論", value: c.conclusion },
+                  { label: "対応", value: c.action },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-xs text-muted-foreground font-medium">{label}</p>
+                    <p className="mt-1">{value ?? "—"}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* 通報内容（ある場合） */}
+          {c.reportContent && (
+            <section className="bg-card border border-border rounded-lg p-5">
+              <h2 className="font-semibold mb-3">通報内容</h2>
+              <p className="text-sm whitespace-pre-wrap text-muted-foreground">{c.reportContent}</p>
+            </section>
           )}
         </div>
-
-        {/* FR-106: 案件サマリー */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3 lg:col-span-2">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold">案件サマリー</h2>
-            <button
-              onClick={() => {
-                if (editingSummary) {
-                  updateSummary.mutate({ id, ...summaryForm });
-                } else {
-                  setSummaryForm({
-                    category: c.category ?? "",
-                    issue: c.issue ?? "",
-                    conclusion: c.conclusion ?? "",
-                    action: c.action ?? "",
-                    referencePoint: c.referencePoint ?? "",
-                  });
-                }
-                setEditingSummary(!editingSummary);
-              }}
-              className="text-sm text-primary hover:underline"
-            >
-              {editingSummary ? "保存" : "編集"}
-            </button>
-          </div>
-
-          {editingSummary ? (
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm text-muted-foreground">事象カテゴリ</label>
-                <input
-                  value={summaryForm.category}
-                  onChange={(e) => setSummaryForm((f) => ({ ...f, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">争点（論点）</label>
-                <textarea
-                  value={summaryForm.issue}
-                  onChange={(e) => setSummaryForm((f) => ({ ...f, issue: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm mt-1"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">結論</label>
-                <textarea
-                  value={summaryForm.conclusion}
-                  onChange={(e) => setSummaryForm((f) => ({ ...f, conclusion: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm mt-1"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">対応（実施したこと）</label>
-                <textarea
-                  value={summaryForm.action}
-                  onChange={(e) => setSummaryForm((f) => ({ ...f, action: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm mt-1"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground">参考になるポイント</label>
-                <input
-                  value={summaryForm.referencePoint}
-                  onChange={(e) => setSummaryForm((f) => ({ ...f, referencePoint: e.target.value }))}
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm mt-1"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <span className="text-muted-foreground">事象カテゴリ:</span>
-              <span>{c.category ?? "—"}</span>
-              <span className="text-muted-foreground">争点:</span>
-              <span>{c.issue ?? "—"}</span>
-              <span className="text-muted-foreground">結論:</span>
-              <span>{c.conclusion ?? "—"}</span>
-              <span className="text-muted-foreground">対応:</span>
-              <span>{c.action ?? "—"}</span>
-              <span className="text-muted-foreground">参考ポイント:</span>
-              <span>{c.referencePoint ?? "—"}</span>
-            </div>
-          )}
-        </div>
-
-        {/* 担当者 */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h2 className="font-semibold">担当者</h2>
-          <div className="space-y-1">
-            {c.assignments.map((a: any) => (
-              <div key={a.id} className="flex items-center gap-2 text-sm">
-                <span>{a.user.name}</span>
-                <span className="text-xs text-muted-foreground">{a.user.email}</span>
-                {c.primaryAssigneeId === a.userId && (
-                  <span className="text-xs px-1.5 py-0.5 bg-primary text-primary-foreground rounded">主担当</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 参考案件 */}
-        <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-          <h2 className="font-semibold">参考案件</h2>
-          {c.referencesFrom.length > 0 ? (
-            <div className="space-y-2">
-              {c.referencesFrom.map((ref: any) => (
-                <Link
-                  key={ref.id}
-                  href={`/cases/${ref.toCaseId}`}
-                  className="block p-2 border border-border rounded hover:bg-accent text-sm"
-                >
-                  <span className="font-medium">{ref.toCase.category ?? ref.toCaseId.slice(0, 8)}</span>
-                  <p className="text-xs text-muted-foreground mt-1">{ref.reason}</p>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">参考案件はありません</p>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -45,4 +45,5 @@ export const AuditEventTypes = {
   LOGIN: "login",
   LOGOUT: "logout",
   USER_INVITED: "user_invited",
+  SETTINGS_UPDATED: "settings_updated",
 } as const;
