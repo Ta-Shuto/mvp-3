@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提案A: グラスモーフィズム + グラデーション</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+    background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 25%, #ffffff 50%, #ecfdf5 75%, #cffafe 100%);
+    min-height: 100vh;
+    display: flex;
+    color: #1e293b;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.5);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold; font-size: 16px;
+  }
+  .logo-text { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .logo-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .nav-section { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 16px 12px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    font-size: 14px; color: #475569;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.6); color: #1e293b; }
+  .nav-item.active {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+  }
+  .nav-icon { width: 20px; height: 20px; opacity: 0.7; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .nav-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,0.5);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 600;
+  }
+  .user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .user-role { font-size: 11px; color: #64748b; }
+
+  /* Main */
+  .main {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+  }
+  .page-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .page-title { font-size: 24px; font-weight: 700; color: #0f172a; }
+  .page-subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+  .header-actions { display: flex; gap: 10px; }
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: white; border: none; padding: 10px 20px;
+    border-radius: 10px; font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.25);
+    transition: all 0.2s;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    color: #475569; border: 1px solid rgba(255,255,255,0.5);
+    padding: 10px 20px;
+    border-radius: 10px; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 16px;
+    padding: 22px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 14px;
+  }
+  .stat-icon.blue { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #3b82f6; }
+  .stat-icon.green { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #22c55e; }
+  .stat-icon.orange { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #f97316; }
+  .stat-icon.purple { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #8b5cf6; }
+  .stat-label { font-size: 13px; color: #64748b; font-weight: 500; }
+  .stat-value { font-size: 30px; font-weight: 700; color: #0f172a; margin: 4px 0; }
+  .stat-change { font-size: 12px; color: #22c55e; font-weight: 500; }
+  .stat-change.negative { color: #ef4444; }
+
+  /* Content Grid */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+  .glass-card {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px;
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+  .card-link { font-size: 13px; color: #6366f1; font-weight: 500; text-decoration: none; }
+
+  /* Table */
+  .table { width: 100%; border-collapse: collapse; }
+  .table th {
+    text-align: left; font-size: 12px; color: #94a3b8;
+    font-weight: 600; padding: 10px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .table td {
+    padding: 14px 12px; font-size: 13px; color: #334155;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .table tr:hover { background: rgba(255,255,255,0.4); }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-red { background: #fef2f2; color: #dc2626; }
+  .badge-orange { background: #fff7ed; color: #ea580c; }
+  .badge-yellow { background: #fefce8; color: #ca8a04; }
+  .badge-blue { background: #eff6ff; color: #2563eb; }
+  .badge-green { background: #f0fdf4; color: #16a34a; }
+  .badge-purple { background: #faf5ff; color: #9333ea; }
+
+  /* Side panel items */
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 3px solid;
+    transition: all 0.2s;
+  }
+  .alert-item:hover { background: rgba(255,255,255,0.6); }
+  .alert-item.urgent { border-left-color: #ef4444; }
+  .alert-item.high { border-left-color: #f97316; }
+  .alert-item.medium { border-left-color: #eab308; }
+  .alert-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+  .alert-meta { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+  .quick-action {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 13px; color: #475569; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .quick-action:hover { background: rgba(255,255,255,0.7); color: #6366f1; }
+  .quick-action-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">IS</div>
+      <div>
+        <div class="logo-text">Interview Support</div>
+        <div class="logo-sub">面談支援プラットフォーム</div>
+      </div>
+    </div>
+    <div class="nav-section">メインメニュー</div>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+      ダッシュボード
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      ケース管理
+      <span class="nav-badge">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0-11V3"/><circle cx="12" cy="11" r="3" stroke-width="2"/></svg>
+      面談一覧
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      テンプレート
+    </a>
+    <div class="nav-section">管理</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/><path stroke-width="2" d="M23 21v-2a4 4 0 00-3-3.87"/><path stroke-width="2" d="M16 3.13a4 4 0 010 7.75"/></svg>
+      ユーザー管理
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      監査ログ
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      設定
+    </a>
+    <div class="sidebar-footer">
+      <div class="avatar">田中</div>
+      <div>
+        <div class="user-name">田中 太郎</div>
+        <div class="user-role">管理者</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">ダッシュボード</div>
+        <div class="page-subtitle">面談支援プラットフォームの概要</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-secondary">📊 レポート出力</button>
+        <button class="btn-primary">＋ 新規ケース作成</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div class="stat-label">総ケース数</div>
+        <div class="stat-value">24</div>
+        <div class="stat-change">↑ 12% 先月比</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">⚡</div>
+        <div class="stat-label">対応中</div>
+        <div class="stat-value">12</div>
+        <div class="stat-change">↑ 3件 今週</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">🔴</div>
+        <div class="stat-label">緊急対応</div>
+        <div class="stat-value">3</div>
+        <div class="stat-change negative">↑ 1件 昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">👥</div>
+        <div class="stat-label">担当者数</div>
+        <div class="stat-value">8</div>
+        <div class="stat-change">アクティブ</div>
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Left: Table -->
+      <div class="glass-card">
+        <div class="card-header">
+          <div class="card-title">最近のケース</div>
+          <a class="card-link" href="#">すべて表示 →</a>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ケース名</th>
+              <th>カテゴリ</th>
+              <th>リスク</th>
+              <th>ステータス</th>
+              <th>更新日</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">職場環境に関する相談</td>
+              <td><span class="badge badge-purple">ハラスメント</span></td>
+              <td><span class="badge badge-red">緊急</span></td>
+              <td><span class="badge badge-blue">対応中</span></td>
+              <td>3/17</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">安全衛生チェック #042</td>
+              <td><span class="badge badge-green">安全衛生</span></td>
+              <td><span class="badge badge-orange">高</span></td>
+              <td><span class="badge badge-blue">対応中</span></td>
+              <td>3/16</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">経費処理に関する調査</td>
+              <td><span class="badge badge-red">不正</span></td>
+              <td><span class="badge badge-yellow">中</span></td>
+              <td><span class="badge badge-purple">調査中</span></td>
+              <td>3/15</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">新入社員フォロー面談</td>
+              <td><span class="badge" style="background:#f1f5f9;color:#475569">その他</span></td>
+              <td><span class="badge" style="background:#f1f5f9;color:#64748b">低</span></td>
+              <td><span class="badge badge-green">進行中</span></td>
+              <td>3/14</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">部署間コンフリクト対応</td>
+              <td><span class="badge badge-purple">ハラスメント</span></td>
+              <td><span class="badge badge-orange">高</span></td>
+              <td><span class="badge badge-blue">対応中</span></td>
+              <td>3/13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right: Alerts & Quick Actions -->
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">🚨 緊急アラート</div>
+          </div>
+          <div class="alert-item urgent">
+            <div>
+              <div class="alert-title">職場環境に関する相談</div>
+              <div class="alert-meta">3日未対応 · ハラスメント</div>
+            </div>
+          </div>
+          <div class="alert-item high">
+            <div>
+              <div class="alert-title">安全衛生チェック #042</div>
+              <div class="alert-meta">面談予定超過 · 安全衛生</div>
+            </div>
+          </div>
+          <div class="alert-item medium">
+            <div>
+              <div class="alert-title">経費処理に関する調査</div>
+              <div class="alert-meta">レビュー待ち · 不正</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">クイックアクション</div>
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">📝</div>
+            新規ケースを作成
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">🎙️</div>
+            面談を開始
+          </div>
+          <div class="quick-action">
+            <div class="quick-action-icon" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe)">📄</div>
+            テンプレートを編集
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

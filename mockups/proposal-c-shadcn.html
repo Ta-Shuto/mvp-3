@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提案C: shadcn/ui スタイル</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+    background: #fafafa;
+    min-height: 100vh;
+    display: flex;
+    color: #0a0a0a;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e5e5;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; margin-bottom: 8px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: #0a0a0a;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: bold; font-size: 13px;
+  }
+  .logo-text { font-size: 15px; font-weight: 700; color: #0a0a0a; }
+  .logo-sub { font-size: 11px; color: #737373; margin-top: 1px; }
+
+  .nav-section {
+    font-size: 11px; color: #a3a3a3; font-weight: 500;
+    padding: 16px 10px 6px; letter-spacing: 0.02em;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    font-size: 14px; color: #525252;
+    cursor: pointer; transition: all 0.15s;
+    text-decoration: none; font-weight: 450;
+  }
+  .nav-item:hover { background: #f5f5f5; color: #0a0a0a; }
+  .nav-item.active {
+    background: #f5f5f5;
+    color: #0a0a0a;
+    font-weight: 600;
+  }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.5; }
+  .nav-item.active .nav-icon { opacity: 0.8; }
+  .nav-badge {
+    margin-left: auto;
+    background: #0a0a0a; color: white;
+    font-size: 11px; padding: 1px 7px;
+    border-radius: 10px; font-weight: 600;
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px;
+    border-top: 1px solid #e5e5e5;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    background: #0a0a0a;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 12px; font-weight: 600;
+  }
+  .user-name { font-size: 13px; font-weight: 600; color: #0a0a0a; }
+  .user-role { font-size: 11px; color: #737373; }
+  .chevron-down { margin-left: auto; color: #a3a3a3; font-size: 14px; }
+
+  /* Main */
+  .main { flex: 1; padding: 32px; overflow-y: auto; }
+  .breadcrumb {
+    font-size: 13px; color: #a3a3a3; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .breadcrumb span { color: #525252; }
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 28px;
+  }
+  .page-title { font-size: 28px; font-weight: 700; color: #0a0a0a; letter-spacing: -0.02em; }
+  .page-subtitle { font-size: 14px; color: #737373; margin-top: 4px; }
+  .btn-primary {
+    background: #0a0a0a; color: white;
+    border: none; padding: 9px 18px;
+    border-radius: 6px; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary:hover { background: #262626; }
+  .btn-outline {
+    background: white; color: #0a0a0a;
+    border: 1px solid #e5e5e5; padding: 9px 18px;
+    border-radius: 6px; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-outline:hover { background: #f5f5f5; }
+  .header-actions { display: flex; gap: 8px; }
+
+  /* Tab Navigation */
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 24px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .tab {
+    padding: 8px 16px; font-size: 14px; font-weight: 500;
+    color: #737373; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: #0a0a0a; }
+  .tab.active { color: #0a0a0a; border-bottom-color: #0a0a0a; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.15s;
+  }
+  .stat-card:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .stat-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .stat-label { font-size: 13px; color: #737373; font-weight: 500; }
+  .stat-header-icon { color: #a3a3a3; font-size: 16px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: #0a0a0a; letter-spacing: -0.02em; }
+  .stat-change { font-size: 12px; color: #737373; font-weight: 400; margin-top: 2px; }
+  .stat-change em { font-style: normal; color: #16a34a; font-weight: 500; }
+  .stat-change em.negative { color: #dc2626; }
+
+  /* Content */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  }
+  .card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 20px 0;
+  }
+  .card-title { font-size: 16px; font-weight: 600; color: #0a0a0a; }
+  .card-description { font-size: 13px; color: #737373; margin-top: 2px; }
+  .card-link { font-size: 13px; color: #0a0a0a; font-weight: 500; text-decoration: none; }
+  .card-link:hover { text-decoration: underline; }
+  .card-content { padding: 16px 20px 20px; }
+
+  /* Table */
+  .table { width: 100%; border-collapse: collapse; }
+  .table th {
+    text-align: left; font-size: 12px; color: #737373;
+    font-weight: 500; padding: 10px 0;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .table td {
+    padding: 12px 0; font-size: 13px; color: #525252;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .table tr:last-child td { border-bottom: none; }
+  .table tr:hover { background: #fafafa; }
+  .case-name { font-weight: 600; color: #0a0a0a; }
+
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 9999px;
+    font-size: 11px; font-weight: 500;
+    border: 1px solid;
+  }
+  .badge-red { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .badge-orange { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+  .badge-yellow { background: #fefce8; color: #a16207; border-color: #fef08a; }
+  .badge-blue { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .badge-green { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+  .badge-purple { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
+  .badge-gray { background: #f5f5f5; color: #525252; border-color: #e5e5e5; }
+
+  /* Right panel */
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    transition: all 0.15s;
+  }
+  .alert-item:hover { background: #f5f5f5; }
+  .alert-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 5px; flex-shrink: 0;
+  }
+  .alert-dot.red { background: #dc2626; }
+  .alert-dot.orange { background: #ea580c; }
+  .alert-dot.yellow { background: #ca8a04; }
+  .alert-title { font-size: 13px; font-weight: 600; color: #0a0a0a; }
+  .alert-meta { font-size: 12px; color: #a3a3a3; margin-top: 2px; }
+
+  .separator { height: 1px; background: #e5e5e5; margin: 16px 0; }
+
+  .quick-action {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 13px; color: #525252; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .quick-action:hover { background: #f5f5f5; color: #0a0a0a; }
+  .quick-action-icon { font-size: 16px; width: 20px; text-align: center; }
+</style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">IS</div>
+      <div>
+        <div class="logo-text">Interview Support</div>
+        <div class="logo-sub">面談支援プラットフォーム</div>
+      </div>
+    </div>
+    <div class="nav-section">メニュー</div>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+      ダッシュボード
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      ケース管理
+      <span class="nav-badge">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0-11V3"/><circle cx="12" cy="11" r="3" stroke-width="2"/></svg>
+      面談一覧
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      テンプレート
+    </a>
+    <div class="nav-section">管理</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4" stroke-width="2"/></svg>
+      ユーザー管理
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      監査ログ
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      設定
+    </a>
+    <div class="sidebar-footer">
+      <div class="avatar">田</div>
+      <div>
+        <div class="user-name">田中 太郎</div>
+        <div class="user-role">管理者</div>
+      </div>
+      <span class="chevron-down">▾</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="breadcrumb">
+      ホーム <span>/</span> <span>ダッシュボード</span>
+    </div>
+    <div class="page-header">
+      <div>
+        <div class="page-title">ダッシュボード</div>
+        <div class="page-subtitle">面談支援プラットフォームの概要</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline">レポート出力</button>
+        <button class="btn-primary">＋ 新規ケース作成</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">概要</div>
+      <div class="tab">ケース分析</div>
+      <div class="tab">レポート</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-label">総ケース数</div>
+          <div class="stat-header-icon">📋</div>
+        </div>
+        <div class="stat-value">24</div>
+        <div class="stat-change"><em>+12%</em> 先月比</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-label">対応中</div>
+          <div class="stat-header-icon">⚡</div>
+        </div>
+        <div class="stat-value">12</div>
+        <div class="stat-change"><em>+3件</em> 今週</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-label">緊急対応</div>
+          <div class="stat-header-icon">🔴</div>
+        </div>
+        <div class="stat-value">3</div>
+        <div class="stat-change"><em class="negative">+1件</em> 昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-label">担当者数</div>
+          <div class="stat-header-icon">👥</div>
+        </div>
+        <div class="stat-value">8</div>
+        <div class="stat-change">アクティブ</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">最近のケース</div>
+            <div class="card-description">直近のケース一覧</div>
+          </div>
+          <a class="card-link" href="#">すべて表示 →</a>
+        </div>
+        <div class="card-content">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ケース名</th>
+                <th>カテゴリ</th>
+                <th>リスク</th>
+                <th>ステータス</th>
+                <th>更新日</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="case-name">職場環境に関する相談</td>
+                <td><span class="badge badge-purple">ハラスメント</span></td>
+                <td><span class="badge badge-red">緊急</span></td>
+                <td><span class="badge badge-blue">対応中</span></td>
+                <td>3月17日</td>
+              </tr>
+              <tr>
+                <td class="case-name">安全衛生チェック #042</td>
+                <td><span class="badge badge-green">安全衛生</span></td>
+                <td><span class="badge badge-orange">高</span></td>
+                <td><span class="badge badge-blue">対応中</span></td>
+                <td>3月16日</td>
+              </tr>
+              <tr>
+                <td class="case-name">経費処理に関する調査</td>
+                <td><span class="badge badge-red">不正</span></td>
+                <td><span class="badge badge-yellow">中</span></td>
+                <td><span class="badge badge-purple">調査中</span></td>
+                <td>3月15日</td>
+              </tr>
+              <tr>
+                <td class="case-name">新入社員フォロー面談</td>
+                <td><span class="badge badge-gray">その他</span></td>
+                <td><span class="badge badge-gray">低</span></td>
+                <td><span class="badge badge-green">進行中</span></td>
+                <td>3月14日</td>
+              </tr>
+              <tr>
+                <td class="case-name">部署間コンフリクト対応</td>
+                <td><span class="badge badge-purple">ハラスメント</span></td>
+                <td><span class="badge badge-orange">高</span></td>
+                <td><span class="badge badge-blue">対応中</span></td>
+                <td>3月13日</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">緊急アラート</div>
+              <div class="card-description">対応が必要なケース</div>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="alert-item">
+              <div class="alert-dot red"></div>
+              <div>
+                <div class="alert-title">職場環境に関する相談</div>
+                <div class="alert-meta">3日未対応 · ハラスメント</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot orange"></div>
+              <div>
+                <div class="alert-title">安全衛生チェック #042</div>
+                <div class="alert-meta">面談予定超過 · 安全衛生</div>
+              </div>
+            </div>
+            <div class="alert-item">
+              <div class="alert-dot yellow"></div>
+              <div>
+                <div class="alert-title">経費処理に関する調査</div>
+                <div class="alert-meta">レビュー待ち · 不正</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">クイックアクション</div>
+          </div>
+          <div class="card-content">
+            <div class="quick-action">
+              <span class="quick-action-icon">📝</span>
+              新規ケースを作成
+            </div>
+            <div class="quick-action">
+              <span class="quick-action-icon">🎙️</span>
+              面談を開始
+            </div>
+            <div class="quick-action">
+              <span class="quick-action-icon">📄</span>
+              テンプレートを編集
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
