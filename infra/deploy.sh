@@ -15,6 +15,11 @@ set -euo pipefail
 #
 # Environment variables (set in .env.production):
 #   DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY
+#
+# Optional SSL variables:
+#   DOMAIN_NAME       - Custom domain (e.g. interview.example.com)
+#   CERTIFICATE_ARN   - ACM certificate ARN
+#   HOSTED_ZONE_ID    - Route 53 Hosted Zone ID
 # ============================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -61,6 +66,9 @@ aws cloudformation deploy \
     NextAuthSecret="${NEXTAUTH_SECRET}" \
     AnthropicApiKey="${ANTHROPIC_API_KEY}" \
     RecallApiKey="${RECALL_API_KEY:-}" \
+    DomainName="${DOMAIN_NAME:-}" \
+    CertificateArn="${CERTIFICATE_ARN:-}" \
+    HostedZoneId="${HOSTED_ZONE_ID:-}" \
   --no-fail-on-empty-changeset
 
 # ---- Step 3: Get stack outputs ----
@@ -174,7 +182,14 @@ echo ""
 echo "=== Deployment Complete ==="
 echo "URL: ${ALB_URL}"
 echo ""
-echo "Next steps:"
-echo "  1. Wait 2-3 minutes for services to stabilize"
-echo "  2. Set up HTTPS: add ACM certificate + update listener"
-echo "  3. Set up custom domain: add Route53 record -> ALB"
+if [ -n "${DOMAIN_NAME:-}" ] && [ -n "${CERTIFICATE_ARN:-}" ]; then
+  echo "SSL: HTTPS enabled at https://${DOMAIN_NAME}"
+  echo "     HTTP -> HTTPS redirect active"
+else
+  echo "SSL: Not configured. To enable HTTPS, set these in .env.production:"
+  echo "  DOMAIN_NAME=interview.example.com"
+  echo "  CERTIFICATE_ARN=arn:aws:acm:ap-northeast-1:${ACCOUNT_ID}:certificate/xxxxx"
+  echo "  HOSTED_ZONE_ID=Z0123456789  (optional, for auto DNS record)"
+  echo ""
+  echo "Then re-run this deploy script."
+fi
