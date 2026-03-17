@@ -111,6 +111,25 @@ export async function generateScript(
 }
 
 /**
+ * Rephrase text with specified tone (FR-121)
+ */
+export async function rephraseText(
+  text: string,
+  tone: "formal" | "gentle" | "firm"
+): Promise<string> {
+  const toneMap = {
+    formal: "フォーマルで丁寧なビジネストーン",
+    gentle: "柔らかく親しみやすいトーン",
+    firm: "毅然とした断定的なトーン",
+  };
+
+  return generateAIResponse({
+    systemPrompt: `以下のテキストを「${toneMap[tone]}」に変換してください。内容の意味は変えず、トーンのみ変更してください。変換後のテキストのみを返してください。`,
+    messages: [{ role: "user", content: text }],
+  });
+}
+
+/**
  * Generate meeting summary (FR-114)
  */
 export async function generateMeetingSummary(

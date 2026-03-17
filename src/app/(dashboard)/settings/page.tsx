@@ -137,8 +137,9 @@ function AutoEndSettings() {
   });
 
   useEffect(() => {
-    if (settings.data?.autoEndSettings) {
-      const s = settings.data.autoEndSettings as any;
+    const d = settings.data as any;
+    if (d?.autoEndSettings) {
+      const s = d.autoEndSettings as any;
       setAutoEndSettings({
         silenceMinutes: s.silenceMinutes ?? 10,
         endOnNoParticipants: s.endOnNoParticipants ?? true,

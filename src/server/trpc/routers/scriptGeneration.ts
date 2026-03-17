@@ -173,4 +173,19 @@ export const scriptGenerationRouter = router({
         },
       });
     }),
+
+  // FR-121: トーン変換
+  rephrase: withPermission("case:update")
+    .input(
+      z.object({
+        caseId: z.string(),
+        text: z.string(),
+        tone: z.enum(["formal", "gentle", "firm"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { rephraseText } = await import("@/server/services/ai");
+      const rephrasedText = await rephraseText(input.text, input.tone);
+      return { rephrasedText };
+    }),
 });

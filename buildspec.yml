@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - ECR_WEB_REPO=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$STACK_NAME-web
+      - ECR_WS_REPO=$ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$STACK_NAME-ws
+  build:
+    commands:
+      - echo Building Next.js image...
+      - docker build -t interview-support-web -f Dockerfile .
+      - docker tag interview-support-web:latest $ECR_WEB_REPO:latest
+      - echo Building WebSocket server image...
+      - docker build -t interview-support-ws -f ws-server/Dockerfile .
+      - docker tag interview-support-ws:latest $ECR_WS_REPO:latest
+  post_build:
+    commands:
+      - echo Pushing images to ECR...
+      - docker push $ECR_WEB_REPO:latest
+      - docker push $ECR_WS_REPO:latest
+      - echo Build and push completed on `date`
