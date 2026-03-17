@@ -124,7 +124,108 @@ export const meetingRouter = router({
       });
     }),
 
-  // FR-110: 面談履歴一覧（横断検索）
+  // 面談セッション一覧（面談管理画面用）
+  list: protectedProcedure
+    .input(
+      z.object({
+        status: z.enum(["all", "scheduled", "in_progress", "completed", "cancelled"]).optional(),
+        keyword: z.string().optional(),
+        page: z.number().default(1),
+        limit: z.number().default(20),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const filters = (input ?? {}) as any;
+      const orgId = ctx.session.user.organizationId;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const where: any = {
+        case: { organizationId: orgId },
+      };
+
+      // ステータスフィルタ
+      if (filters.status === "scheduled") {
+        where.startedAt = null;
+      } else if (filters.status === "in_progress") {
+        where.startedAt = { not: null };
+        where.endedAt = null;
+      } else if (filters.status === "completed") {
+        where.endedAt = { not: null };
+        where.endReason = { not: null };
+      } else if (filters.status === "cancelled") {
+        where.endReason = "MANUAL";
+        where.endedAt = { not: null };
+      }
+
+      const skip = ((filters.page ?? 1) - 1) * (filters.limit ?? 20);
+
+      const [meetings, total] = await Promise.all([
+        ctx.prisma.meeting.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: filters.limit ?? 20,
+          include: {
+            case: {
+              select: {
+                id: true,
+                caseName: true,
+                category: true,
+                primaryAssignee: { select: { id: true, name: true } },
+              },
+            },
+            transcripts: { select: { id: true } },
+          },
+        }),
+        ctx.prisma.meeting.count({ where }),
+      ]);
+
+      return {
+        meetings: meetings.map((m: any) => ({
+          ...m,
+          transcriptCount: m.transcripts?.length ?? 0,
+          transcripts: undefined,
+        })),
+        total,
+        page: filters.page ?? 1,
+        totalPages: Math.ceil(total / (filters.limit ?? 20)),
+      };
+    }),
+
+  // 新規面談登録
+  create: withPermission("meeting:manage")
+    .input(
+      z.object({
+        caseId: z.string(),
+        scheduledAt: z.string().datetime(),
+        interviewerId: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const caseData = await ctx.prisma.case.findFirst({
+        where: { id: input.caseId, organizationId: ctx.session.user.organizationId },
+      });
+      if (!caseData) throw new TRPCError({ code: "NOT_FOUND", message: "案件が見つかりません" });
+
+      const meeting = await ctx.prisma.meeting.create({
+        data: {
+          caseId: input.caseId,
+          createdAt: new Date(input.scheduledAt),
+        },
+      });
+
+      await writeAuditLog({
+        organizationId: ctx.session.user.organizationId,
+        userId: ctx.session.user.id,
+        caseId: input.caseId,
+        eventType: AuditEventTypes.MEETING_STARTED,
+        details: { meetingId: meeting.id, scheduledAt: input.scheduledAt },
+      });
+
+      return meeting;
+    }),
+
+  // 面談履歴一覧（横断検索 - 旧interviews画面用に残す）
   listHistory: protectedProcedure
     .input(
       z.object({
@@ -168,6 +269,7 @@ export const meetingRouter = router({
               select: {
                 id: true,
                 category: true,
+                caseName: true,
                 primaryAssignee: { select: { name: true } },
               },
             },

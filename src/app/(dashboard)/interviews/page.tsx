@@ -4,104 +4,286 @@ import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import Link from "next/link";
 
-export default function InterviewsPage() {
-  const [filters, setFilters] = useState({
-    keyword: "",
-    dateFrom: "",
-    dateTo: "",
-    page: 1,
+const meetingStatusLabels: Record<string, string> = {
+  scheduled: "予定",
+  in_progress: "進行中",
+  completed: "完了",
+  cancelled: "中止",
+};
+
+const meetingStatusColors: Record<string, string> = {
+  scheduled: "bg-blue-100 text-blue-700",
+  in_progress: "bg-green-100 text-green-700",
+  completed: "bg-gray-100 text-gray-600",
+  cancelled: "bg-red-100 text-red-600",
+};
+
+function getMeetingStatus(m: any): string {
+  if (!m.startedAt && !m.endedAt) return "scheduled";
+  if (m.startedAt && !m.endedAt) return "in_progress";
+  if (m.endedAt) return "completed";
+  return "scheduled";
+}
+
+export default function MeetingManagementPage() {
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const utils = trpc.useUtils();
+
+  const meetings = trpc.meeting.list.useQuery({
+    status: statusFilter !== "all" ? statusFilter as any : undefined,
+    page,
   });
 
-  const history = trpc.meeting.listHistory.useQuery({
-    keyword: filters.keyword || undefined,
-    dateFrom: filters.dateFrom || undefined,
-    dateTo: filters.dateTo || undefined,
-    page: filters.page,
-  });
+  // 全件でカウント取得
+  const allMeetings = trpc.meeting.list.useQuery({ limit: 1000 });
+  const statusCounts = {
+    all: allMeetings.data?.total ?? 0,
+    scheduled: allMeetings.data?.meetings.filter((m: any) => getMeetingStatus(m) === "scheduled").length ?? 0,
+    in_progress: allMeetings.data?.meetings.filter((m: any) => getMeetingStatus(m) === "in_progress").length ?? 0,
+    completed: allMeetings.data?.meetings.filter((m: any) => getMeetingStatus(m) === "completed").length ?? 0,
+    cancelled: 0,
+  };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">面談履歴</h1>
-
-      {/* FR-110: 検索・絞り込み */}
-      <div className="flex gap-4 flex-wrap">
-        <input
-          type="text"
-          placeholder="キーワード検索..."
-          value={filters.keyword}
-          onChange={(e) => setFilters((f) => ({ ...f, keyword: e.target.value, page: 1 }))}
-          className="px-3 py-2 border border-input rounded-md bg-background text-sm flex-1 min-w-48"
-        />
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-muted-foreground">期間:</label>
-          <input
-            type="date"
-            value={filters.dateFrom}
-            onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-input rounded-md bg-background text-sm"
-          />
-          <span className="text-muted-foreground">〜</span>
-          <input
-            type="date"
-            value={filters.dateTo}
-            onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-input rounded-md bg-background text-sm"
-          />
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold">面談管理</h1>
+          <p className="text-sm text-muted-foreground mt-1">面談セッションの一覧・管理</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90"
+        >
+          + 新規面談
+        </button>
       </div>
 
-      {/* 面談履歴一覧 */}
+      {/* ステータスタブ */}
+      <div className="flex gap-2">
+        {[
+          { key: "all", label: "すべて", count: statusCounts.all },
+          { key: "scheduled", label: "予定", count: statusCounts.scheduled },
+          { key: "in_progress", label: "進行中", count: statusCounts.in_progress },
+          { key: "completed", label: "完了", count: statusCounts.completed },
+          { key: "cancelled", label: "中止", count: statusCounts.cancelled },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => { setStatusFilter(tab.key); setPage(1); }}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              statusFilter === tab.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {tab.label} {tab.count}
+          </button>
+        ))}
+      </div>
+
+      {/* 面談テーブル */}
       <div className="bg-card border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="text-left p-3">実施日時</th>
-              <th className="text-left p-3">案件名</th>
-              <th className="text-left p-3">面談担当者</th>
-              <th className="text-left p-3">要点</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">案件名</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">面談担当者</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">予定日時</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">実施日</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">ステータス</th>
+              <th className="text-right p-3 font-medium text-muted-foreground">発言数</th>
             </tr>
           </thead>
           <tbody>
-            {(history.data as any)?.meetings?.map((m: any) => (
-              <tr key={m.id} className="border-b border-border hover:bg-accent/50">
-                <td className="p-3 whitespace-nowrap">
-                  {m.startedAt ? new Date(m.startedAt).toLocaleString("ja-JP") : "—"}
-                </td>
-                <td className="p-3">
-                  <Link href={`/cases/${m.case?.id}`} className="text-primary hover:underline">
-                    {m.case?.category ?? `案件 ${m.case?.id?.slice(0, 8)}`}
-                  </Link>
-                </td>
-                <td className="p-3">{m.case?.primaryAssignee?.name ?? "—"}</td>
-                <td className="p-3 text-muted-foreground max-w-xs truncate">
-                  {m.meetingSummary?.slice(0, 100) ?? "—"}
+            {meetings.data?.meetings.map((m: any) => {
+              const status = getMeetingStatus(m);
+              return (
+                <tr key={m.id} className="border-b border-border hover:bg-accent/50">
+                  <td className="p-3">
+                    <Link
+                      href={`/cases/${m.case?.id}/meeting`}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {m.case?.caseName ?? m.case?.category ?? `案件 ${m.case?.id?.slice(0, 8)}`}
+                    </Link>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      <Link href={`/cases/${m.case?.id}/meeting`} className="hover:underline">
+                        面談詳細を開く
+                      </Link>
+                    </p>
+                  </td>
+                  <td className="p-3 text-muted-foreground">
+                    {m.case?.primaryAssignee?.name ?? "—"}
+                  </td>
+                  <td className="p-3 text-muted-foreground">
+                    {m.createdAt
+                      ? new Date(m.createdAt).toLocaleString("ja-JP", {
+                          year: "numeric", month: "numeric", day: "numeric",
+                          hour: "2-digit", minute: "2-digit",
+                        })
+                      : "—"}
+                  </td>
+                  <td className="p-3 text-muted-foreground">
+                    {m.startedAt
+                      ? new Date(m.startedAt).toLocaleDateString("ja-JP")
+                      : "—"}
+                  </td>
+                  <td className="p-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${meetingStatusColors[status]}`}>
+                      {meetingStatusLabels[status]}
+                    </span>
+                  </td>
+                  <td className="p-3 text-right text-muted-foreground">
+                    {m.transcriptCount}
+                  </td>
+                </tr>
+              );
+            })}
+            {meetings.data?.meetings.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                  面談がありません
                 </td>
               </tr>
-            ))}
-            {(history.data as any)?.meetings?.length === 0 && (
-              <tr><td colSpan={4} className="p-4 text-center text-muted-foreground">面談履歴がありません</td></tr>
             )}
           </tbody>
         </table>
-        {history.isLoading && <p className="p-4 text-muted-foreground">読み込み中...</p>}
+        {meetings.isLoading && <p className="p-4 text-muted-foreground">読み込み中...</p>}
       </div>
 
-      {/* ページネーション */}
-      {(history.data as any)?.totalPages > 1 && (
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: (history.data as any).totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setFilters((f) => ({ ...f, page }))}
-              className={`px-3 py-1 rounded text-sm ${
-                page === filters.page ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-accent"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
+      <p className="text-xs text-muted-foreground text-right">
+        {meetings.data?.total ?? 0}件表示
+      </p>
+
+      {/* 新規面談モーダル */}
+      {showCreateModal && (
+        <CreateMeetingModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            utils.meeting.list.invalidate();
+          }}
+        />
       )}
+    </div>
+  );
+}
+
+function CreateMeetingModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [caseId, setCaseId] = useState("");
+  const [interviewerId, setInterviewerId] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
+
+  const cases = trpc.case.list.useQuery({ limit: 100 });
+  const users = trpc.user.list.useQuery();
+
+  const createMeeting = trpc.meeting.create.useMutation({
+    onSuccess: () => onSuccess(),
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMeeting.mutate({
+      caseId,
+      scheduledAt: new Date(scheduledAt).toISOString(),
+      interviewerId: interviewerId || undefined,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-card border border-border rounded-lg w-full max-w-md mx-4">
+        <div className="flex items-center gap-3 p-6 border-b border-border">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">
+            ←
+          </button>
+          <div>
+            <h2 className="text-lg font-bold">新規面談登録</h2>
+            <p className="text-sm text-muted-foreground">面談セッションを新しく登録します</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              対象案件 <span className="text-destructive">*</span>
+            </label>
+            <select
+              value={caseId}
+              onChange={(e) => setCaseId(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            >
+              <option value="">案件を選択してください</option>
+              {cases.data?.cases.map((c: any) => (
+                <option key={c.id} value={c.id}>
+                  {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              面談担当者 <span className="text-destructive">*</span>
+            </label>
+            <select
+              value={interviewerId}
+              onChange={(e) => setInterviewerId(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            >
+              <option value="">担当者を選択してください</option>
+              {(users.data as any)?.map((u: any) => (
+                <option key={u.id} value={u.id}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              予定日時 <span className="text-destructive">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            />
+          </div>
+
+          {createMeeting.error && (
+            <p className="text-sm text-destructive">{createMeeting.error.message}</p>
+          )}
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent transition-colors"
+            >
+              キャンセル
+            </button>
+            <button
+              type="submit"
+              disabled={createMeeting.isPending || !caseId || !scheduledAt}
+              className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            >
+              {createMeeting.isPending ? "登録中..." : "面談を登録する"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

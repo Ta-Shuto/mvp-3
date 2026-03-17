@@ -7,13 +7,10 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "ダッシュボード", href: "/", roles: ["ADMIN", "INTERVIEWER"] },
-  { name: "案件一覧", href: "/cases", roles: ["ADMIN", "INTERVIEWER"] },
-  { name: "面談履歴", href: "/interviews", roles: ["ADMIN", "INTERVIEWER"] },
+  { name: "通報・案件管理", href: "/cases", roles: ["ADMIN", "INTERVIEWER"] },
+  { name: "面談管理", href: "/interviews", roles: ["ADMIN", "INTERVIEWER"] },
   { name: "ユーザー管理", href: "/users", roles: ["ADMIN"] },
-  { name: "テンプレ設定", href: "/templates", roles: ["ADMIN"] },
-  { name: "法人設定", href: "/settings", roles: ["ADMIN"] },
-  { name: "監査ログ", href: "/audit-logs", roles: ["ADMIN"] },
-  { name: "運営管理", href: "/ops", roles: ["OPERATOR"] },
+  { name: "設定", href: "/settings", roles: ["ADMIN"] },
 ];
 
 export function Sidebar() {
