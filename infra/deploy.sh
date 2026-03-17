@@ -130,6 +130,30 @@ aws ecs run-task \
 echo ">> Waiting for migration to complete..."
 sleep 30
 
+# ---- Step 7.5: Run database seed ----
+echo ">> Running database seed..."
+aws ecs run-task \
+  --cluster "${CLUSTER_NAME}" \
+  --task-definition "${TASK_DEF}" \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[$(aws cloudformation describe-stack-resources \
+    --stack-name "${STACK_NAME}" \
+    --query "StackResources[?LogicalResourceId=='PrivateSubnet1'].PhysicalResourceId" \
+    --output text --region "${REGION}")],securityGroups=[$(aws cloudformation describe-stack-resources \
+    --stack-name "${STACK_NAME}" \
+    --query "StackResources[?LogicalResourceId=='AppSecurityGroup'].PhysicalResourceId" \
+    --output text --region "${REGION}")]}" \
+  --overrides '{
+    "containerOverrides": [{
+      "name": "web",
+      "command": ["npx", "tsx", "prisma/seed.ts"]
+    }]
+  }' \
+  --region "${REGION}"
+
+echo ">> Waiting for seed to complete..."
+sleep 30
+
 # ---- Step 8: Start ECS services (set desired count to 1) ----
 echo ">> Starting ECS services..."
 aws ecs update-service \
@@ -152,6 +176,5 @@ echo "URL: ${ALB_URL}"
 echo ""
 echo "Next steps:"
 echo "  1. Wait 2-3 minutes for services to stabilize"
-echo "  2. Run seed data: adjust deploy.sh to run db:seed task"
-echo "  3. Set up HTTPS: add ACM certificate + update listener"
-echo "  4. Set up custom domain: add Route53 record -> ALB"
+echo "  2. Set up HTTPS: add ACM certificate + update listener"
+echo "  3. Set up custom domain: add Route53 record -> ALB"
