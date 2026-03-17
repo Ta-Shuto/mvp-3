@@ -395,7 +395,7 @@ Resources:
       ContainerDefinitions:
         - Name: web
           Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NextJSRepo}:latest"
-          Command: ["sh", "docker-entrypoint.sh"]
+          Command: ["node", "server.js"]
           PortMappings:
             - ContainerPort: 3000
               Protocol: tcp
