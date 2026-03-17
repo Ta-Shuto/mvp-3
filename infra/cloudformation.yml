@@ -394,7 +394,7 @@ Resources:
             - Name: NODE_ENV
               Value: production
             - Name: DATABASE_URL
-              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support"
+              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=require"
             - Name: REDIS_URL
               Value: !Sub "redis://${RedisCluster.RedisEndpoint.Address}:${RedisCluster.RedisEndpoint.Port}"
             - Name: NEXTAUTH_URL
@@ -447,7 +447,7 @@ Resources:
             - Name: WS_SERVER_PORT
               Value: "3001"
             - Name: DATABASE_URL
-              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support"
+              Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=require"
             - Name: ANTHROPIC_API_KEY
               Value: !Ref AnthropicApiKey
           LogConfiguration:
