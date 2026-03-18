@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "./NotificationBell";
 
 const navigation = [
   { name: "ダッシュボード", href: "/", icon: "grid", roles: ["ADMIN", "INTERVIEWER"] },
@@ -103,6 +104,7 @@ export function Sidebar() {
                 <p className="text-base font-semibold truncate text-foreground">{session.user.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
               </div>
+              <NotificationBell />
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}

@@ -11,12 +11,19 @@ const toneLabels: Record<string, string> = {
   STRONG: "厳格",
 };
 
+const toneApiMap: Record<string, string> = {
+  POLITE: "formal",
+  NEUTRAL: "gentle",
+  STRONG: "firm",
+};
+
 export default function ScriptGenerationPage() {
   const params = useParams();
   const caseId = params.id as string;
   const utils = trpc.useUtils();
 
   const scriptGen = trpc.scriptGeneration.getByCase.useQuery({ caseId });
+  const caseData = trpc.case.getById.useQuery({ id: caseId });
   const saveInputs = trpc.scriptGeneration.saveInputs.useMutation({
     onSuccess: () => utils.scriptGeneration.getByCase.invalidate({ caseId }),
   });
@@ -41,6 +48,8 @@ export default function ScriptGenerationPage() {
   const [selectedTone, setSelectedTone] = useState<string>("POLITE");
   const [rephraseTarget, setRephraseTarget] = useState<string | null>(null);
   const [rephrasedText, setRephrasedText] = useState("");
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
 
   const data = scriptGen.data as any;
 
@@ -60,13 +69,23 @@ export default function ScriptGenerationPage() {
     }
   }, [data]);
 
+  // Auto-load pre-chat AI summary if available
+  const loadPreChatData = () => {
+    const c = caseData.data as any;
+    if (c?.preChat?.aiSummary) {
+      setPreAiResponse(c.preChat.aiSummary);
+      setUsePreAi(true);
+      saveInputs.mutate({ caseId, preAiResponseText: c.preChat.aiSummary, usePreAiResponse: true });
+    }
+  };
+
   const handleRephrase = async (section: string, text: string) => {
     setRephraseTarget(section);
     try {
       const result = await rephrase.mutateAsync({
         caseId,
         text,
-        tone: selectedTone as any,
+        tone: toneApiMap[selectedTone] as any,
       });
       setRephrasedText((result as any)?.rephrasedText ?? text);
     } catch {
@@ -102,11 +121,24 @@ export default function ScriptGenerationPage() {
     URL.revokeObjectURL(url);
   };
 
+  const loadVersion = (version: any) => {
+    setSelectedVersion(version.version);
+    const content = version.content as any;
+    if (content) {
+      setScriptForm({
+        scenarios: content.scenarios ?? "",
+        issues: content.issues ?? "",
+        questions: content.questions ?? "",
+        pastTrends: content.pastTrends ?? "",
+      });
+    }
+  };
+
   const scriptSections = [
-    { key: "scenarios", label: "考えられるシナリオ" },
-    { key: "issues", label: "争点になりそうなポイント" },
-    { key: "questions", label: "質問リスト（優先度付き）" },
-    { key: "pastTrends", label: "過去案件の傾向" },
+    { key: "scenarios", label: "考えられるシナリオ", icon: "scenario" },
+    { key: "issues", label: "争点になりそうなポイント", icon: "issue" },
+    { key: "questions", label: "質問リスト（優先度付き）", icon: "question" },
+    { key: "pastTrends", label: "過去案件の傾向", icon: "trend" },
   ];
 
   return (
@@ -118,14 +150,47 @@ export default function ScriptGenerationPage() {
           </Link>
           <h1 className="text-3xl font-bold">台本生成</h1>
         </div>
-        {data?.generatedScript && (
-          <button
-            onClick={handleExportScript}
-            className="px-4 py-2 border border-border rounded-lg text-base hover:bg-accent"
-          >
-            テキスト出力
-          </button>
-        )}
+        <div className="flex gap-2">
+          {data?.generatedScript && (
+            <>
+              <button
+                onClick={() => setShowComparison(!showComparison)}
+                className="px-4 py-2 border border-border rounded-lg text-base hover:bg-accent"
+              >
+                {showComparison ? "通常表示" : "バージョン比較"}
+              </button>
+              <button
+                onClick={handleExportScript}
+                className="px-4 py-2 border border-border rounded-lg text-base hover:bg-accent"
+              >
+                テキスト出力
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ステップインジケーター */}
+      <div className="flex items-center gap-2">
+        {[
+          { num: 1, label: "入力データ準備", done: !!inquiryEmail.trim() },
+          { num: 2, label: "台本生成", done: !!data?.generatedScript },
+          { num: 3, label: "編集・調整", done: (data?.versions?.length ?? 0) > 1 },
+        ].map((step, i) => (
+          <div key={step.num} className="flex items-center gap-2">
+            {i > 0 && <div className="w-8 h-px bg-border" />}
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+              step.done ? "bg-green-100 text-green-700" : "bg-white/30 text-muted-foreground"
+            }`}>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                step.done ? "bg-green-500 text-white" : "bg-white/50"
+              }`}>
+                {step.done ? "✓" : step.num}
+              </span>
+              {step.label}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* 問い合わせメール入力 */}
@@ -145,18 +210,28 @@ export default function ScriptGenerationPage() {
       <section className="bg-card border border-border rounded-lg p-5">
         <div className="flex justify-between items-center mb-3">
           <h2 className="font-semibold">事前AI回答結果</h2>
-          <label className="flex items-center gap-2 text-base cursor-pointer">
-            <input
-              type="checkbox"
-              checked={usePreAi}
-              onChange={(e) => {
-                setUsePreAi(e.target.checked);
-                saveInputs.mutate({ caseId, usePreAiResponse: e.target.checked });
-              }}
-              className="rounded"
-            />
-            台本生成に使用する
-          </label>
+          <div className="flex items-center gap-3">
+            {(caseData.data as any)?.preChat?.aiSummary && !preAiResponse && (
+              <button
+                onClick={loadPreChatData}
+                className="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200"
+              >
+                事前チャットから取込
+              </button>
+            )}
+            <label className="flex items-center gap-2 text-base cursor-pointer">
+              <input
+                type="checkbox"
+                checked={usePreAi}
+                onChange={(e) => {
+                  setUsePreAi(e.target.checked);
+                  saveInputs.mutate({ caseId, usePreAiResponse: e.target.checked });
+                }}
+                className="rounded"
+              />
+              台本生成に使用する
+            </label>
+          </div>
         </div>
         <textarea
           value={preAiResponse}
@@ -175,8 +250,11 @@ export default function ScriptGenerationPage() {
           disabled={generate.isPending || !inquiryEmail.trim()}
           className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-50"
         >
-          {generate.isPending ? "台本を生成中..." : "台本を生成"}
+          {generate.isPending ? "台本を生成中..." : data?.generatedScript ? "台本を再生成" : "台本を生成"}
         </button>
+        {generate.isError && (
+          <p className="text-sm text-red-500 mt-2">生成に失敗しました。再試行してください。</p>
+        )}
       </div>
 
       {/* 生成結果表示 */}
@@ -260,7 +338,7 @@ export default function ScriptGenerationPage() {
                 />
               ) : (
                 <div className="text-base whitespace-pre-wrap">
-                  {(data.generatedScript as any)[key] || "（データなし）"}
+                  {(scriptForm as any)[key] || (data.generatedScript as any)[key] || "（データなし）"}
                 </div>
               )}
 
@@ -294,9 +372,15 @@ export default function ScriptGenerationPage() {
           {data.versions?.length > 0 && (
             <section className="bg-card border border-border rounded-lg p-5">
               <h3 className="font-semibold mb-3">バージョン履歴</h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
+              <div className="space-y-2 max-h-48 overflow-y-auto">
                 {data.versions.map((v: any) => (
-                  <div key={v.id} className="flex items-center justify-between p-2 border border-border rounded-lg text-base">
+                  <div
+                    key={v.id}
+                    className={`flex items-center justify-between p-2 border rounded-lg text-base cursor-pointer transition-colors ${
+                      selectedVersion === v.version ? "border-primary bg-primary/5" : "border-border hover:bg-accent/50"
+                    }`}
+                    onClick={() => loadVersion(v)}
+                  >
                     <div className="flex items-center gap-3">
                       <span className="font-medium">v{v.version}</span>
                       <span className="text-muted-foreground">
@@ -304,6 +388,7 @@ export default function ScriptGenerationPage() {
                       </span>
                       {v.editedBy && <span className="text-sm text-muted-foreground">{v.editedBy.name}</span>}
                     </div>
+                    <span className="text-xs text-muted-foreground">クリックで読み込み</span>
                   </div>
                 ))}
               </div>

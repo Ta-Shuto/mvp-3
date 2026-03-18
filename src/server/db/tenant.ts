@@ -94,6 +94,41 @@ export function getTenantDb(organizationId: string) {
           where: { id: organizationId },
         }),
     },
+    fileAttachment: {
+      findMany: (args?: any) =>
+        prisma.fileAttachment.findMany({
+          ...args,
+          where: { ...args?.where, organizationId },
+        }),
+      findUnique: (args: any) =>
+        prisma.fileAttachment.findUnique(args),
+      create: (args: any) =>
+        prisma.fileAttachment.create({
+          ...args,
+          data: { ...args.data, organizationId },
+        }),
+      delete: (args: any) =>
+        prisma.fileAttachment.delete(args),
+    },
+    notification: {
+      findMany: (args?: any) =>
+        prisma.notification.findMany({
+          ...args,
+          where: { ...args?.where, organizationId },
+        }),
+      count: (args?: any) =>
+        prisma.notification.count({
+          ...args,
+          where: { ...args?.where, organizationId },
+        }),
+      updateMany: (args: any) =>
+        prisma.notification.updateMany(args),
+      create: (args: any) =>
+        prisma.notification.create({
+          ...args,
+          data: { ...args.data, organizationId },
+        }),
+    },
   };
 }
 

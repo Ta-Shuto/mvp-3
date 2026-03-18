@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { FileUpload } from "@/components/common/FileUpload";
 
 const progressLabels: Record<string, string> = {
   RECEPTION: "受付",
@@ -420,6 +421,12 @@ export default function CaseDetailPage() {
               <p className="text-base whitespace-pre-wrap text-muted-foreground">{c.reportContent}</p>
             </section>
           )}
+
+          {/* ファイル添付 */}
+          <section className="bg-card border border-border rounded-lg p-5">
+            <h2 className="font-semibold mb-4">添付ファイル</h2>
+            <FileUpload caseId={id} />
+          </section>
         </div>
       )}
     </div>

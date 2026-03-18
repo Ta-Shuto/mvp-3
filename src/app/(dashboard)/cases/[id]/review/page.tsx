@@ -117,20 +117,34 @@ export default function ReviewPage() {
         </div>
 
         {/* エクスポート */}
-        {currentMeeting && (
-          <div className="flex gap-2">
-            {["csv", "pdf", "txt"].map((fmt) => (
-              <button
-                key={fmt}
-                onClick={() => handleExport(fmt)}
-                disabled={exportFormat !== null}
-                className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent disabled:opacity-50"
-              >
-                {exportFormat === fmt ? "処理中..." : `${fmt.toUpperCase()}`}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex gap-2">
+          {currentMeeting && ["csv", "pdf", "txt"].map((fmt) => (
+            <button
+              key={fmt}
+              onClick={() => handleExport(fmt)}
+              disabled={exportFormat !== null}
+              className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent disabled:opacity-50"
+            >
+              {exportFormat === fmt ? "処理中..." : `${fmt.toUpperCase()}`}
+            </button>
+          ))}
+          <button
+            onClick={async () => {
+              const res = await fetch(`/api/export?caseId=${caseId}&format=txt`);
+              if (!res.ok) return alert("エクスポートに失敗しました");
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `case-${caseId.slice(0, 8)}.txt`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="px-3 py-1.5 text-sm border border-primary text-primary rounded-lg hover:bg-primary/5"
+          >
+            案件一括出力
+          </button>
+        </div>
       </div>
 
       {completedMeetings.length === 0 && (

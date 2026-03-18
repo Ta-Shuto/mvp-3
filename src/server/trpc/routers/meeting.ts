@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, withPermission, router } from "../router";
 import { writeAuditLog, AuditEventTypes } from "@/server/services/audit";
+import { createNotification } from "./notification";
 import { TRPCError } from "@trpc/server";
 
 export const meetingRouter = router({
@@ -48,6 +49,22 @@ export const meetingRouter = router({
         eventType: AuditEventTypes.MEETING_ENDED,
         details: { reason: "MANUAL" },
       });
+
+      // Notify assigned users about meeting end
+      const assignments = await ctx.prisma.caseAssignment.findMany({
+        where: { caseId: meeting.caseId },
+        select: { userId: true },
+      });
+      for (const a of assignments) {
+        createNotification(ctx.prisma, {
+          organizationId: ctx.session.user.organizationId,
+          userId: a.userId,
+          type: "meeting_ended",
+          title: "面談が終了しました",
+          message: "面談記録のレビューを行ってください",
+          linkUrl: `/cases/${meeting.caseId}/review`,
+        }).catch(() => {});
+      }
 
       return updated;
     }),

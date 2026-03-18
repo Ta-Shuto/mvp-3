@@ -10,6 +10,8 @@ import { userRouter } from "./routers/user";
 import { orgSettingsRouter } from "./routers/orgSettings";
 import { questionRouter } from "./routers/question";
 import { analysisRouter } from "./routers/analysis";
+import { fileAttachmentRouter } from "./routers/fileAttachment";
+import { notificationRouter } from "./routers/notification";
 
 export const appRouter = router({
   dashboard: dashboardRouter,
@@ -23,6 +25,8 @@ export const appRouter = router({
   orgSettings: orgSettingsRouter,
   question: questionRouter,
   analysis: analysisRouter,
+  fileAttachment: fileAttachmentRouter,
+  notification: notificationRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -101,10 +101,12 @@ model Organization {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  users      User[]
-  templates  Template[]
-  cases      Case[]
-  auditLogs  AuditLog[]
+  users           User[]
+  templates       Template[]
+  cases           Case[]
+  auditLogs       AuditLog[]
+  fileAttachments FileAttachment[]
+  notifications   Notification[]
 
   @@map("organizations")
 }
@@ -128,6 +130,8 @@ model User {
   templateUpdates Template[]        @relation("TemplateUpdater")
   scriptVersions  ScriptVersion[]
   progressHistory ProgressHistory[] @relation("ProgressUpdater")
+  fileUploads     FileAttachment[]  @relation("FileUploader")
+  notifications   Notification[]
 
   @@index([organizationId])
   @@map("users")
@@ -206,6 +210,7 @@ model Case {
   progressHistory  ProgressHistory[]
   referencesFrom   CaseReference[]   @relation("ReferenceFrom")
   referencesTo     CaseReference[]   @relation("ReferenceTo")
+  fileAttachments  FileAttachment[]
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -309,9 +314,10 @@ model Meeting {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
-  case        Case         @relation(fields: [caseId], references: [id])
-  transcripts Transcript[]
-  riskItems   RiskItem[]
+  case            Case             @relation(fields: [caseId], references: [id])
+  transcripts     Transcript[]
+  riskItems       RiskItem[]
+  fileAttachments FileAttachment[]
 
   @@index([caseId])
   @@map("meetings")
@@ -400,4 +406,46 @@ model AuditLog {
   @@index([organizationId, eventType])
   @@index([organizationId, createdAt])
   @@map("audit_logs")
+}
+
+model FileAttachment {
+  id             String   @id @default(cuid())
+  organizationId String
+  caseId         String?
+  meetingId      String?
+  uploadedById   String
+  fileName       String
+  fileSize       Int
+  mimeType       String
+  s3Key          String
+  category       String   @default("general")
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  case         Case?        @relation(fields: [caseId], references: [id])
+  meeting      Meeting?     @relation(fields: [meetingId], references: [id])
+  uploadedBy   User         @relation("FileUploader", fields: [uploadedById], references: [id])
+
+  @@index([organizationId])
+  @@index([caseId])
+  @@map("file_attachments")
+}
+
+model Notification {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  type           String
+  title          String
+  message        String   @db.Text
+  linkUrl        String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@index([organizationId])
+  @@map("notifications")
 }

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, withPermission, router } from "../router";
 import { writeAuditLog, AuditEventTypes } from "@/server/services/audit";
+import { notifyByRole } from "./notification";
 import { TRPCError } from "@trpc/server";
 
 const caseCategoryEnum = z.enum(["HARASSMENT", "FRAUD", "SAFETY", "OTHER"]);
@@ -184,6 +185,16 @@ export const caseRouter = router({
         caseId: newCase.id,
         eventType: AuditEventTypes.CASE_CREATED,
       });
+
+      // Notify admins about new case
+      notifyByRole(ctx.prisma, {
+        organizationId: ctx.session.user.organizationId,
+        role: "ADMIN",
+        type: "case_created",
+        title: "新規案件が作成されました",
+        message: `${input.caseName} (${input.caseCategory})`,
+        linkUrl: `/cases/${newCase.id}`,
+      }).catch(() => {});
 
       return { caseId: newCase.id, created: true };
     }),
@@ -379,6 +390,23 @@ ${input.reportContent}
         caseId: input.id,
         eventType: AuditEventTypes.CASE_CLOSED,
       });
+
+      // Notify assigned users about case closure
+      const assignments = await ctx.prisma.caseAssignment.findMany({
+        where: { caseId: input.id },
+        select: { userId: true },
+      });
+      const { createNotification } = await import("./notification");
+      for (const a of assignments) {
+        createNotification(ctx.prisma, {
+          organizationId: ctx.session.user.organizationId,
+          userId: a.userId,
+          type: "case_status_changed",
+          title: "案件がクローズされました",
+          message: `案件 ${input.id.slice(0, 8)} がクローズされました`,
+          linkUrl: `/cases/${input.id}`,
+        }).catch(() => {});
+      }
 
       return updated;
     }),
