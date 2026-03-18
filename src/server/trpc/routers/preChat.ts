@@ -186,6 +186,25 @@ export const preChatRouter = router({
         eventType: AuditEventTypes.PRE_CHAT_SUBMITTED,
       });
 
+      // Notify assigned users about pre-chat submission
+      const { createNotification } = await import("./notification");
+      const assignments = await prisma.caseAssignment.findMany({
+        where: { caseId: preChat.caseId },
+        select: { userId: true },
+      });
+      await Promise.all(
+        assignments.map((a) =>
+          createNotification(prisma, {
+            organizationId: preChat.case.organizationId,
+            userId: a.userId,
+            type: "pre_chat_submitted",
+            title: "事前回答が提出されました",
+            message: "被面談者が事前チャットの回答を提出しました。内容を確認してください。",
+            linkUrl: `/cases/${preChat.caseId}`,
+          })
+        )
+      );
+
       return updated;
     }),
 

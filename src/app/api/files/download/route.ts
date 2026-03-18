@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(result.body, {
       headers: {
         "Content-Type": result.contentType,
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(file.fileName)}"`,
+        "Content-Disposition": `attachment; filename="${encodeURIComponent(file.fileName)}"; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
       },
     });
   } catch (error) {

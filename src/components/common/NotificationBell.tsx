@@ -90,7 +90,9 @@ export function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-xl hover:bg-white/40 transition-colors"
-        title="通知"
+        aria-label={`通知${count > 0 ? ` (${count}件の未読)` : ""}`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <svg className="w-5 h-5 text-foreground/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -104,7 +106,7 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-96 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
+        <div role="menu" aria-label="通知一覧" className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-xl z-50 overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h3 className="font-semibold">通知</h3>
             {count > 0 && (

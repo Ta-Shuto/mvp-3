@@ -45,7 +45,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 text-base text-destructive bg-destructive/10 rounded-xl">
+            <div role="alert" className="p-3 text-base text-destructive bg-destructive/10 rounded-xl">
               {error}
             </div>
           )}
@@ -58,6 +58,7 @@ export default function LoginPage() {
               id="email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2.5 border border-white/50 rounded-xl bg-white/30 text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
@@ -73,6 +74,7 @@ export default function LoginPage() {
               id="password"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2.5 border border-white/50 rounded-xl bg-white/30 text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
@@ -87,6 +89,33 @@ export default function LoginPage() {
             {loading ? "ログイン中..." : "ログイン"}
           </button>
         </form>
+
+        {/* SSO Login buttons - shown when SSO providers are configured */}
+        <div className="space-y-3">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/30" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-card text-muted-foreground">または</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => signIn("oidc", { callbackUrl: "/" })}
+            className="w-full py-2.5 px-4 border border-white/50 rounded-xl font-medium text-foreground hover:bg-white/10 transition-all"
+          >
+            SSO (OIDC) でログイン
+          </button>
+          <button
+            type="button"
+            onClick={() => signIn("saml", { callbackUrl: "/" })}
+            className="w-full py-2.5 px-4 border border-white/50 rounded-xl font-medium text-foreground hover:bg-white/10 transition-all"
+          >
+            SSO (SAML) でログイン
+          </button>
+        </div>
       </div>
     </div>
   );

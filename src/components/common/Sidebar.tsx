@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "./NotificationBell";
 
@@ -41,13 +42,14 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const userRole = (session?.user as Record<string, unknown>)?.role as string;
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const filteredNav = navigation.filter((item) =>
     item.roles.includes(userRole)
   );
 
-  return (
-    <div className="flex flex-col w-64 glass-sidebar min-h-screen">
+  const sidebarContent = (
+    <>
       {/* Logo */}
       <div className="p-5 border-b border-white/30">
         <div className="flex items-center gap-3">
@@ -62,11 +64,21 @@ export function Sidebar() {
               </p>
             )}
           </div>
+          {/* Mobile close button */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="ml-auto lg:hidden text-muted-foreground hover:text-foreground"
+            aria-label="メニューを閉じる"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-3 pt-2 pb-1">
           メインメニュー
         </p>
@@ -76,6 +88,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition-all",
                 active
@@ -97,7 +110,7 @@ export function Sidebar() {
         {session?.user && (
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
                 {session.user.name?.[0] ?? "?"}
               </div>
               <div className="flex-1 min-w-0">
@@ -115,6 +128,44 @@ export function Sidebar() {
           </div>
         )}
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-xl bg-card border border-border shadow-lg"
+        aria-label="メニューを開く"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-72 glass-sidebar flex flex-col lg:hidden transform transition-transform duration-300",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {sidebarContent}
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:flex lg:flex-col lg:w-64 glass-sidebar min-h-screen">
+        {sidebarContent}
+      </div>
+    </>
   );
 }

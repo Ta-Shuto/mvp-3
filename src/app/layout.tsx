@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/common/Providers";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { ToastContainer } from "@/components/common/Toast";
 
 export const metadata: Metadata = {
   title: "面談支援プラットフォーム",
@@ -15,7 +17,12 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+          <ToastContainer />
+        </Providers>
       </body>
     </html>
   );
