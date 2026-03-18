@@ -9,17 +9,20 @@ COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
 # Generate Prisma client
 COPY prisma ./prisma
+COPY prisma.config.ts ./prisma.config.ts
 RUN npx prisma generate
 
 # Stage 2: Build
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/src/generated ./src/generated
 COPY . .
 
 # Remove seed scripts not needed for production build (avoids TS errors during next build)
-RUN rm -f prisma/seed-dummy.ts
+RUN find . -name "seed-dummy.ts" -delete
+
+# Copy freshly generated Prisma client AFTER COPY . . to prevent overwrite
+COPY --from=deps /app/src/generated ./src/generated
 
 # Remove dev-only config
 ENV NEXT_TELEMETRY_DISABLED=1
