@@ -61,8 +61,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">ダッシュボード</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="text-3xl font-bold text-foreground">ダッシュボード</h1>
+        <p className="text-base text-muted-foreground mt-1">
           {userName} さん、おかえりなさい
         </p>
       </div>
@@ -83,11 +83,11 @@ export default function DashboardPage() {
               {...(wrapperProps as any)}
               className="p-5 bg-card border border-border rounded-2xl hover-lift"
             >
-              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${statIcons[card.idx].gradient} flex items-center justify-center text-xl mb-3`}>
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${statIcons[card.idx].gradient} flex items-center justify-center text-2xl mb-3`}>
                 {statIcons[card.idx].icon}
               </div>
-              <p className="text-sm text-muted-foreground">{card.label}</p>
-              <p className={`text-3xl font-bold mt-1 ${card.valueColor ?? ""}`}>{card.value}</p>
+              <p className="text-base text-muted-foreground">{card.label}</p>
+              <p className={`text-4xl font-bold mt-1 ${card.valueColor ?? ""}`}>{card.value}</p>
             </Wrapper>
           );
         })}
@@ -111,23 +111,23 @@ export default function DashboardPage() {
                     className="block p-2.5 rounded-xl hover:bg-white/40 transition-colors"
                   >
                     <div className="flex justify-between items-start">
-                      <p className="text-sm font-medium truncate pr-2">
+                      <p className="text-base font-medium truncate pr-2">
                         {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
                       </p>
                       {daysLeft !== null && (
-                        <span className={`text-xs font-bold whitespace-nowrap ${daysLeft < 0 ? "text-destructive" : "text-orange-600"}`}>
+                        <span className={`text-sm font-bold whitespace-nowrap ${daysLeft < 0 ? "text-destructive" : "text-orange-600"}`}>
                           {daysLeft < 0 ? `${Math.abs(daysLeft)}日超過` : `${daysLeft}日`}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {c.primaryAssignee?.name ?? "未割当"}
                     </p>
                   </Link>
                 );
               })}
               {(urgentCases.data?.length ?? 0) === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-2">期限超過の案件なし</p>
+                <p className="text-base text-muted-foreground text-center py-2">期限超過の案件なし</p>
               )}
             </div>
           </section>
@@ -145,19 +145,19 @@ export default function DashboardPage() {
                     className="block p-2.5 rounded-xl hover:bg-white/40 transition-colors"
                   >
                     <div className="flex justify-between items-start">
-                      <p className="text-sm font-medium truncate pr-2">
+                      <p className="text-base font-medium truncate pr-2">
                         {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
                       </p>
-                      <span className="text-xs font-bold text-orange-600 whitespace-nowrap">{daysSince}日</span>
+                      <span className="text-sm font-bold text-orange-600 whitespace-nowrap">{daysSince}日</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       {c.primaryAssignee?.name ?? "未割当"}
                     </p>
                   </Link>
                 );
               })}
               {(staleCases.data?.length ?? 0) === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-2">未更新の案件なし</p>
+                <p className="text-base text-muted-foreground text-center py-2">未更新の案件なし</p>
               )}
             </div>
           </section>
@@ -168,13 +168,13 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <Link
                 href="/cases"
-                className="block w-full text-left px-3 py-2.5 text-sm rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
+                className="block w-full text-left px-3 py-2.5 text-base rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
               >
                 + 新規案件を登録
               </Link>
               <Link
                 href="/interviews"
-                className="block w-full text-left px-3 py-2.5 text-sm rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
+                className="block w-full text-left px-3 py-2.5 text-base rounded-xl bg-white/40 hover:bg-white/60 transition-colors"
               >
                 面談を管理
               </Link>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-semibold">リスク評価マトリクス</h2>
               {riskMatrix.data && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-sm text-muted-foreground">
                   対応中
                   {Object.values(riskMatrix.data).reduce(
                     (sum, row) => sum + Object.values(row as Record<string, number>).reduce((s, v) => s + v, 0),
@@ -198,7 +198,7 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-            <table className="w-full text-sm">
+            <table className="w-full text-base">
               <thead>
                 <tr className="text-muted-foreground">
                   <th className="text-left p-2 font-medium">重大度</th>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
                   return (
                     <tr key={level} className="border-t border-white/30">
                       <td className="p-2">
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${riskLevelColors[level]}`}>
+                        <span className={`inline-block px-2 py-0.5 rounded text-sm font-medium ${riskLevelColors[level]}`}>
                           {riskLevelLabels[level]}
                         </span>
                       </td>
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                           {row[cat] ? (
                             <Link
                               href={`/cases?category=${cat}&risk=${level}`}
-                              className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${riskLevelColors[level]} hover:opacity-80`}
+                              className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-medium ${riskLevelColors[level]} hover:opacity-80`}
                             >
                               {row[cat]}
                             </Link>
@@ -239,14 +239,14 @@ export default function DashboardPage() {
                 })}
               </tbody>
             </table>
-            {riskMatrix.isLoading && <p className="text-muted-foreground mt-2 text-sm">読み込み中...</p>}
+            {riskMatrix.isLoading && <p className="text-muted-foreground mt-2 text-base">読み込み中...</p>}
           </section>
 
           {/* 最近の案件 */}
           <section className="bg-card border border-border rounded-2xl p-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-semibold">最近の案件</h2>
-              <Link href="/cases" className="text-sm text-primary hover:underline">
+              <Link href="/cases" className="text-base text-primary hover:underline">
                 すべて見る →
               </Link>
             </div>
@@ -259,10 +259,10 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-base font-medium">
                         {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="text-sm text-muted-foreground mt-0.5">
                         {new Date(c.createdAt).toLocaleDateString("ja-JP")}
                         {c.caseCategory && ` / ${categoryLabels[c.caseCategory] ?? c.caseCategory}`}
                       </p>
@@ -270,21 +270,21 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     {c.riskLevel && (
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${riskLevelColors[c.riskLevel]}`}>
+                      <span className={`px-2 py-0.5 rounded text-sm font-medium ${riskLevelColors[c.riskLevel]}`}>
                         {riskLevelLabels[c.riskLevel]}
                       </span>
                     )}
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[c.status] ?? "bg-gray-100"}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusColors[c.status] ?? "bg-gray-100"}`}>
                       {statusLabels[c.status] ?? c.status}
                     </span>
                   </div>
                 </Link>
               ))}
               {recentCases.data?.length === 0 && (
-                <p className="text-center text-muted-foreground text-sm py-4">案件がありません</p>
+                <p className="text-center text-muted-foreground text-base py-4">案件がありません</p>
               )}
             </div>
-            {recentCases.isLoading && <p className="text-muted-foreground text-sm">読み込み中...</p>}
+            {recentCases.isLoading && <p className="text-muted-foreground text-base">読み込み中...</p>}
           </section>
         </div>
       </div>

@@ -50,12 +50,12 @@ export default function MeetingManagementPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">面談管理</h1>
-          <p className="text-sm text-muted-foreground mt-1">面談セッションの一覧・管理</p>
+          <h1 className="text-3xl font-bold">面談管理</h1>
+          <p className="text-base text-muted-foreground mt-1">面談セッションの一覧・管理</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90"
+          className="px-4 py-2 btn-glass-primary rounded-xl text-base font-medium hover:opacity-90"
         >
           + 新規面談
         </button>
@@ -73,7 +73,7 @@ export default function MeetingManagementPage() {
           <button
             key={tab.key}
             onClick={() => { setStatusFilter(tab.key); setPage(1); }}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-base font-medium transition-colors ${
               statusFilter === tab.key
                 ? "btn-glass-primary"
                 : "bg-secondary text-muted-foreground hover:bg-white/40"
@@ -86,7 +86,7 @@ export default function MeetingManagementPage() {
 
       {/* 面談テーブル */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead>
             <tr className="border-b border-border glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground">案件名</th>
@@ -109,7 +109,7 @@ export default function MeetingManagementPage() {
                     >
                       {m.case?.caseName ?? m.case?.category ?? `案件 ${m.case?.id?.slice(0, 8)}`}
                     </Link>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm text-muted-foreground mt-0.5">
                       <Link href={`/cases/${m.case?.id}/meeting`} className="hover:underline">
                         面談詳細を開く
                       </Link>
@@ -132,7 +132,7 @@ export default function MeetingManagementPage() {
                       : "—"}
                   </td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${meetingStatusColors[status]}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${meetingStatusColors[status]}`}>
                       {meetingStatusLabels[status]}
                     </span>
                   </td>
@@ -154,7 +154,7 @@ export default function MeetingManagementPage() {
         {meetings.isLoading && <p className="p-4 text-muted-foreground">読み込み中...</p>}
       </div>
 
-      <p className="text-xs text-muted-foreground text-right">
+      <p className="text-sm text-muted-foreground text-right">
         {meetings.data?.total ?? 0}件表示
       </p>
 
@@ -203,25 +203,25 @@ function CreateMeetingModal({
     <div className="fixed inset-0 glass-overlay flex items-center justify-center z-50">
       <div className="glass-modal rounded-2xl w-full max-w-md mx-4">
         <div className="flex items-center gap-3 p-6 border-b border-border">
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xl">
             ←
           </button>
           <div>
-            <h2 className="text-lg font-bold">新規面談登録</h2>
-            <p className="text-sm text-muted-foreground">面談セッションを新しく登録します</p>
+            <h2 className="text-xl font-bold">新規面談登録</h2>
+            <p className="text-base text-muted-foreground">面談セッションを新しく登録します</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               対象案件 <span className="text-destructive">*</span>
             </label>
             <select
               value={caseId}
               onChange={(e) => setCaseId(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
             >
               <option value="">案件を選択してください</option>
               {cases.data?.cases.map((c: any) => (
@@ -233,14 +233,14 @@ function CreateMeetingModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               面談担当者 <span className="text-destructive">*</span>
             </label>
             <select
               value={interviewerId}
               onChange={(e) => setInterviewerId(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
             >
               <option value="">担当者を選択してください</option>
               {(users.data as any)?.map((u: any) => (
@@ -250,7 +250,7 @@ function CreateMeetingModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               予定日時 <span className="text-destructive">*</span>
             </label>
             <input
@@ -258,26 +258,26 @@ function CreateMeetingModal({
               value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
             />
           </div>
 
           {createMeeting.error && (
-            <p className="text-sm text-destructive">{createMeeting.error.message}</p>
+            <p className="text-base text-destructive">{createMeeting.error.message}</p>
           )}
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-white/50 rounded-xl bg-white/30 text-sm hover:bg-white/40 transition-colors"
+              className="flex-1 px-4 py-2 border border-white/50 rounded-xl bg-white/30 text-base hover:bg-white/40 transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={createMeeting.isPending || !caseId || !scheduledAt}
-              className="flex-1 px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-4 py-2 btn-glass-primary rounded-xl text-base font-medium hover:opacity-90 disabled:opacity-50"
             >
               {createMeeting.isPending ? "登録中..." : "面談を登録する"}
             </button>

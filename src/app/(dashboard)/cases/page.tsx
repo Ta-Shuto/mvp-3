@@ -100,12 +100,12 @@ function CasesPageContent() {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">案件管理</h1>
-          <p className="text-sm text-muted-foreground mt-1">内部通報案件の一覧・管理</p>
+          <h1 className="text-3xl font-bold">案件管理</h1>
+          <p className="text-base text-muted-foreground mt-1">内部通報案件の一覧・管理</p>
         </div>
         <button
           onClick={() => setShowCreatePage(true)}
-          className="px-4 py-2 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90"
+          className="px-4 py-2 btn-glass-primary rounded-xl text-base font-medium hover:opacity-90"
         >
           + 新規案件
         </button>
@@ -123,7 +123,7 @@ function CasesPageContent() {
           <button
             key={tab.key}
             onClick={() => { setStatusFilter(tab.key === "active" ? "PRE_INPUT_PENDING" : tab.key === "investigating" ? "MEETING_ENDED" : tab.key === "closed" ? "CLOSED" : "all"); setPage(1); }}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-base font-medium transition-colors ${
               (statusFilter === "all" && tab.key === "all") ||
               (statusFilter === "PRE_INPUT_PENDING" && tab.key === "active") ||
               (statusFilter === "MEETING_ENDED" && tab.key === "investigating") ||
@@ -145,7 +145,7 @@ function CasesPageContent() {
             placeholder="案件名で検索..."
             value={keyword}
             onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+            className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
           />
         </div>
 
@@ -161,7 +161,7 @@ function CasesPageContent() {
             <button
               key={opt.key}
               onClick={() => { setCategoryFilter(opt.key); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${
                 categoryFilter === opt.key
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50"
@@ -184,7 +184,7 @@ function CasesPageContent() {
             <button
               key={opt.key}
               onClick={() => { setRiskFilter(opt.key); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${
                 riskFilter === opt.key
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border text-muted-foreground hover:border-primary/50"
@@ -198,7 +198,7 @@ function CasesPageContent() {
 
       {/* 案件テーブル */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead>
             <tr className="border-b border-white/20 glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground">案件名</th>
@@ -225,7 +225,7 @@ function CasesPageContent() {
                   </span>
                 </td>
                 <td className="p-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[c.status] ?? "bg-gray-100"}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusColors[c.status] ?? "bg-gray-100"}`}>
                     {statusLabels[c.status] ?? c.status}
                   </span>
                 </td>
@@ -256,7 +256,7 @@ function CasesPageContent() {
         {cases.isLoading && <p className="p-4 text-muted-foreground">読み込み中...</p>}
       </div>
 
-      <p className="text-xs text-muted-foreground text-right">
+      <p className="text-sm text-muted-foreground text-right">
         {cases.data?.total ?? 0}件表示
       </p>
 
@@ -267,7 +267,7 @@ function CasesPageContent() {
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`px-3 py-1 rounded text-sm ${
+              className={`px-3 py-1 rounded text-base ${
                 p === page
                   ? "btn-glass-primary"
                   : "bg-secondary hover:bg-white/40"
@@ -324,12 +324,12 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-lg">
+        <button onClick={onBack} className="text-muted-foreground hover:text-foreground text-xl">
           ←
         </button>
         <div>
-          <h1 className="text-2xl font-bold">新規案件登録</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold">新規案件登録</h1>
+          <p className="text-base text-muted-foreground mt-1">
             通報内容を貼り付けてAIが自動分類します
           </p>
         </div>
@@ -339,12 +339,12 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
         {/* ステップ1: 通報内容入力 */}
         <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">1</span>
             <h2 className="font-semibold">通報内容を入力</h2>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">受付チャネル</label>
+            <label className="block text-base font-medium mb-2">受付チャネル</label>
             <div className="flex gap-2">
               {[
                 { value: "EMAIL" as const, label: "メール" },
@@ -356,7 +356,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
                   key={ch.value}
                   type="button"
                   onClick={() => setIntakeChannel(ch.value)}
-                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-lg border text-base font-medium transition-colors ${
                     intakeChannel === ch.value
                       ? "border-primary bg-primary/5 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -369,7 +369,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               通報内容（メール本文・電話メモ等をそのまま貼り付け）
             </label>
             <textarea
@@ -377,7 +377,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
               onChange={(e) => setReportContent(e.target.value)}
               rows={6}
               placeholder={"通報メールの本文をここに貼り付けてください...\n\n例：\n○○部の△△課長から日常的に大声で叱責を受けています。先月は会議中に「お前は無能だ」と言われ..."}
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm resize-y"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base resize-y"
             />
           </div>
 
@@ -386,7 +386,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
               type="button"
               onClick={() => reportContent && analyzeMutation.mutate({ reportContent })}
               disabled={!reportContent || analyzeMutation.isPending}
-              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg text-base font-medium hover:opacity-90 disabled:opacity-50"
             >
               {analyzeMutation.isPending ? "分析中..." : "AIで分析"}
             </button>
@@ -396,12 +396,12 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
         {/* ステップ2: 案件情報 */}
         <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-bold">2</span>
             <h2 className="font-semibold">案件情報を確認・修正</h2>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               案件名 <span className="text-destructive">*</span>
             </label>
             <input
@@ -410,12 +410,12 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
               onChange={(e) => setCaseName(e.target.value)}
               required
               placeholder="例：営業部パワハラ申告"
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-base font-medium mb-2">
               カテゴリ <span className="text-destructive">*</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -424,7 +424,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
                   key={cat}
                   type="button"
                   onClick={() => setCaseCategory(cat)}
-                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg border text-base font-medium transition-colors ${
                     caseCategory === cat
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -437,14 +437,14 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">リスクレベル</label>
+            <label className="block text-base font-medium mb-2">リスクレベル</label>
             <div className="flex gap-2">
               {(["LOW", "MEDIUM", "HIGH", "URGENT"] as const).map((level) => (
                 <button
                   key={level}
                   type="button"
                   onClick={() => setRiskLevel(level)}
-                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-lg border text-base font-medium transition-colors ${
                     riskLevel === level
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:border-primary/50"
@@ -457,7 +457,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-base font-medium mb-1">
               受付日 <span className="text-destructive">*</span>
             </label>
             <input
@@ -465,7 +465,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
               value={receivedDate}
               onChange={(e) => setReceivedDate(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base"
             />
           </div>
         </div>
@@ -473,7 +473,7 @@ function CreateCasePage({ onBack }: { onBack: () => void }) {
         <button
           type="submit"
           disabled={createMutation.isPending || !caseName}
-          className="w-full px-4 py-3 btn-glass-primary rounded-xl text-sm font-medium hover:opacity-90 disabled:opacity-50"
+          className="w-full px-4 py-3 btn-glass-primary rounded-xl text-base font-medium hover:opacity-90 disabled:opacity-50"
         >
           {createMutation.isPending ? "登録中..." : "案件を登録する"}
         </button>

@@ -46,13 +46,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-5 border-b border-white/30">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-indigo-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-indigo-500/20">
             IS
           </div>
           <div>
-            <h2 className="text-sm font-bold text-foreground">Interview Support</h2>
+            <h2 className="text-base font-bold text-foreground">Interview Support</h2>
             {session?.user && (
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {(session.user as Record<string, unknown>).organizationName as string}
               </p>
             )}
@@ -62,7 +62,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1">
-        <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider px-3 pt-2 pb-1">
+        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-3 pt-2 pb-1">
           メインメニュー
         </p>
         {filteredNav.map((item) => {
@@ -72,7 +72,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all",
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition-all",
                 active
                   ? "nav-active font-medium"
                   : "text-foreground/70 hover:bg-white/40 hover:text-foreground"
@@ -92,17 +92,17 @@ export function Sidebar() {
         {session?.user && (
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
                 {session.user.name?.[0] ?? "?"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate text-foreground">{session.user.name}</p>
-                <p className="text-[11px] text-muted-foreground truncate">{session.user.email}</p>
+                <p className="text-base font-semibold truncate text-foreground">{session.user.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
               </div>
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+              className="text-sm text-muted-foreground hover:text-destructive transition-colors"
             >
               ログアウト
             </button>

@@ -110,10 +110,10 @@ export default function ReviewPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-sm">
+          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-base">
             &larr; 案件詳細
           </Link>
-          <h1 className="text-2xl font-bold">面談レビュー</h1>
+          <h1 className="text-3xl font-bold">面談レビュー</h1>
         </div>
 
         {/* エクスポート */}
@@ -124,7 +124,7 @@ export default function ReviewPage() {
                 key={fmt}
                 onClick={() => handleExport(fmt)}
                 disabled={exportFormat !== null}
-                className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-accent disabled:opacity-50"
+                className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent disabled:opacity-50"
               >
                 {exportFormat === fmt ? "処理中..." : `${fmt.toUpperCase()}`}
               </button>
@@ -146,14 +146,14 @@ export default function ReviewPage() {
             <button
               key={m.id}
               onClick={() => setSelectedMeetingIndex(i)}
-              className={`px-3 py-1.5 text-sm rounded-lg border ${
+              className={`px-3 py-1.5 text-base rounded-lg border ${
                 i === selectedMeetingIndex
                   ? "bg-primary text-primary-foreground border-primary"
                   : "border-border hover:bg-accent"
               }`}
             >
               面談 {completedMeetings.length - i}
-              <span className="ml-2 text-xs opacity-70">
+              <span className="ml-2 text-sm opacity-70">
                 {new Date(m.endedAt).toLocaleDateString("ja-JP")}
               </span>
             </button>
@@ -170,7 +170,7 @@ export default function ReviewPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors relative ${
+                  className={`px-4 py-2.5 text-base font-medium border-b-2 transition-colors relative ${
                     activeTab === tab.key
                       ? "text-primary border-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
@@ -178,7 +178,7 @@ export default function ReviewPage() {
                 >
                   {tab.label}
                   {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className="ml-1.5 px-1.5 py-0.5 text-xs rounded-full bg-red-100 text-red-700 font-medium">
+                    <span className="ml-1.5 px-1.5 py-0.5 text-sm rounded-full bg-red-100 text-red-700 font-medium">
                       {tab.badge}
                     </span>
                   )}
@@ -191,7 +191,7 @@ export default function ReviewPage() {
           {activeTab === "transcript" && (
             <div className="bg-card border border-border rounded-lg flex flex-col" style={{ maxHeight: "65vh" }}>
               <div className="p-3 border-b border-border flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
+                <span className="text-base text-muted-foreground">
                   {filteredTranscripts.length}件の確定発言
                 </span>
                 <input
@@ -199,13 +199,13 @@ export default function ReviewPage() {
                   placeholder="検索..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
-                  className="px-2 py-1 border border-border rounded-lg text-xs w-40"
+                  className="px-2 py-1 border border-border rounded-lg text-sm w-40"
                 />
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {filteredTranscripts.map((t: any) => (
-                  <div key={t.id} className="flex gap-2 text-sm">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap min-w-14">
+                  <div key={t.id} className="flex gap-2 text-base">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap min-w-14">
                       {Math.floor(t.timestamp / 60)}:{String(Math.floor(t.timestamp % 60)).padStart(2, "0")}
                     </span>
                     <span className="font-medium min-w-20 text-primary">{t.speaker}</span>
@@ -216,13 +216,13 @@ export default function ReviewPage() {
                         t.text
                       )}
                     </span>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${confidenceColors[t.confidence] ?? ""}`}>
+                    <span className={`text-sm px-1.5 py-0.5 rounded ${confidenceColors[t.confidence] ?? ""}`}>
                       {confidenceLabels[t.confidence] ?? t.confidence}
                     </span>
                   </div>
                 ))}
                 {filteredTranscripts.length === 0 && (
-                  <p className="text-center text-muted-foreground text-sm py-8">
+                  <p className="text-center text-muted-foreground text-base py-8">
                     {searchKeyword ? "該当する発言が見つかりません" : "文字起こしデータなし"}
                   </p>
                 )}
@@ -238,7 +238,7 @@ export default function ReviewPage() {
                   <button
                     key={status}
                     onClick={() => setRiskFilter(status)}
-                    className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                    className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
                       riskFilter === status
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-border text-muted-foreground hover:border-primary/50"
@@ -251,22 +251,22 @@ export default function ReviewPage() {
 
               <div className="space-y-3">
                 {filteredRiskItems.map((r: any) => (
-                  <div key={r.id} className={`bg-card border rounded-lg p-4 text-sm space-y-2 ${
+                  <div key={r.id} className={`bg-card border rounded-lg p-4 text-base space-y-2 ${
                     r.status === "PENDING" ? "border-red-200" : "border-border"
                   }`}>
                     <div className="flex justify-between items-start">
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${confidenceColors[r.confidence] ?? ""}`}>
+                      <span className={`text-sm px-1.5 py-0.5 rounded ${confidenceColors[r.confidence] ?? ""}`}>
                         信頼度: {confidenceLabels[r.confidence] ?? r.confidence}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm text-muted-foreground">
                         {Math.floor(r.timestamp / 60)}:{String(Math.floor(r.timestamp % 60)).padStart(2, "0")}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">{r.speaker}</p>
+                    <p className="text-sm text-muted-foreground">{r.speaker}</p>
                     <p className="font-medium">&ldquo;{r.text}&rdquo;</p>
-                    <p className="text-muted-foreground text-xs">理由: {r.reason}</p>
+                    <p className="text-muted-foreground text-sm">理由: {r.reason}</p>
                     {r.rephrasing && (
-                      <div className="bg-muted p-2 rounded text-xs">
+                      <div className="bg-muted p-2 rounded text-sm">
                         <span className="font-medium">言い換え案: </span>{r.rephrasing}
                       </div>
                     )}
@@ -275,19 +275,19 @@ export default function ReviewPage() {
                         <>
                           <button
                             onClick={() => updateRiskStatus.mutate({ riskItemId: r.id, status: "ACCEPTED" })}
-                            className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200"
+                            className="px-2 py-0.5 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200"
                           >
                             採択
                           </button>
                           <button
                             onClick={() => updateRiskStatus.mutate({ riskItemId: r.id, status: "REJECTED" })}
-                            className="px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200"
+                            className="px-2 py-0.5 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200"
                           >
                             却下
                           </button>
                         </>
                       ) : (
-                        <span className={`text-xs px-2 py-0.5 rounded ${
+                        <span className={`text-sm px-2 py-0.5 rounded ${
                           r.status === "ACCEPTED" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                         }`}>
                           {r.status === "ACCEPTED" ? "採択" : "却下"}
@@ -297,7 +297,7 @@ export default function ReviewPage() {
                   </div>
                 ))}
                 {filteredRiskItems.length === 0 && (
-                  <p className="text-center text-muted-foreground text-sm py-8 bg-card border border-border rounded-lg">
+                  <p className="text-center text-muted-foreground text-base py-8 bg-card border border-border rounded-lg">
                     リスク項目なし
                   </p>
                 )}
@@ -315,7 +315,7 @@ export default function ReviewPage() {
                     <>
                       <button
                         onClick={() => setEditingSummary(false)}
-                        className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-accent"
+                        className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
                       >
                         キャンセル
                       </button>
@@ -325,7 +325,7 @@ export default function ReviewPage() {
                           setEditingSummary(false);
                         }}
                         disabled={updateSummary.isPending}
-                        className="px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:opacity-90"
+                        className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90"
                       >
                         保存
                       </button>
@@ -341,7 +341,7 @@ export default function ReviewPage() {
                         });
                         setEditingSummary(true);
                       }}
-                      className="px-3 py-1.5 text-xs border border-border rounded-lg hover:bg-accent"
+                      className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
                     >
                       編集
                     </button>
@@ -357,18 +357,18 @@ export default function ReviewPage() {
                     { key: "concerns", label: "懸念事項" },
                   ].map(({ key, label }) => (
                     <div key={key}>
-                      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                      <label className="text-sm font-medium text-muted-foreground">{label}</label>
                       <textarea
                         value={(summaryForm as any)[key]}
                         onChange={(e) => setSummaryForm((f) => ({ ...f, [key]: e.target.value }))}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base mt-1"
                         rows={4}
                       />
                     </div>
                   ))}
                 </div>
               ) : currentMeeting.meetingSummary ? (
-                <div className="space-y-4 text-sm">
+                <div className="space-y-4 text-base">
                   {typeof currentMeeting.meetingSummary === "string" ? (
                     <p className="whitespace-pre-wrap">{currentMeeting.meetingSummary}</p>
                   ) : (
@@ -381,7 +381,7 @@ export default function ReviewPage() {
                       if (!value) return null;
                       return (
                         <div key={key}>
-                          <h3 className="text-xs font-medium text-muted-foreground mb-1">{label}</h3>
+                          <h3 className="text-sm font-medium text-muted-foreground mb-1">{label}</h3>
                           <p className="whitespace-pre-wrap">{value}</p>
                         </div>
                       );
@@ -389,7 +389,7 @@ export default function ReviewPage() {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">要点データがありません（面談終了後に自動生成されます）</p>
+                <p className="text-base text-muted-foreground">要点データがありません（面談終了後に自動生成されます）</p>
               )}
             </section>
           )}
@@ -398,12 +398,12 @@ export default function ReviewPage() {
           {activeTab === "report" && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   面談データに基づいた構造化レポートを作成します
                 </p>
                 <button
                   onClick={generateReport}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-base font-medium hover:opacity-90"
                 >
                   自動生成
                 </button>
@@ -419,12 +419,12 @@ export default function ReviewPage() {
                   { key: "nextSteps", label: "次のステップ", rows: 3 },
                 ].map(({ key, label, rows }) => (
                   <div key={key}>
-                    <label className="block text-sm font-medium mb-1">{label}</label>
+                    <label className="block text-base font-medium mb-1">{label}</label>
                     <textarea
                       value={(reportData as any)[key]}
                       onChange={(e) => setReportData((d) => ({ ...d, [key]: e.target.value }))}
                       rows={rows}
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm resize-y"
+                      className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base resize-y"
                       placeholder={`${label}を入力...`}
                     />
                   </div>
@@ -450,7 +450,7 @@ export default function ReviewPage() {
                     navigator.clipboard.writeText(report);
                     alert("クリップボードにコピーしました");
                   }}
-                  className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent"
+                  className="px-4 py-2 border border-border rounded-lg text-base hover:bg-accent"
                 >
                   レポートをコピー
                 </button>

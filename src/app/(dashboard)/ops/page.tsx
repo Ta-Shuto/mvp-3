@@ -31,8 +31,8 @@ export default function OpsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">運営管理</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="text-3xl font-bold">運営管理</h1>
+        <p className="text-base text-muted-foreground mt-1">
           システム全体のモニタリングと運営状況
         </p>
       </div>
@@ -46,8 +46,8 @@ export default function OpsPage() {
           { label: "長期未更新", value: staleCases.data?.length ?? 0, color: "text-orange-600" },
         ].map((card) => (
           <div key={card.label} className="border border-white/40 rounded-2xl bg-white/30 p-4">
-            <p className="text-sm text-muted-foreground">{card.label}</p>
-            <p className={`text-3xl font-bold mt-1 ${card.color ?? ""}`}>{card.value}</p>
+            <p className="text-base text-muted-foreground">{card.label}</p>
+            <p className={`text-4xl font-bold mt-1 ${card.color ?? ""}`}>{card.value}</p>
           </div>
         ))}
       </div>
@@ -63,9 +63,9 @@ export default function OpsPage() {
               const closed = data?.closed ?? 0;
               return (
                 <div key={key} className="border border-white/40 rounded-2xl bg-white/30 p-3">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="text-xl font-bold mt-1">{active}</p>
-                  <p className="text-xs text-muted-foreground">完了: {closed}</p>
+                  <p className="text-sm text-muted-foreground">{label}</p>
+                  <p className="text-2xl font-bold mt-1">{active}</p>
+                  <p className="text-sm text-muted-foreground">完了: {closed}</p>
                 </div>
               );
             })}
@@ -78,7 +78,7 @@ export default function OpsPage() {
         <div className="p-4 border-b border-border">
           <h2 className="font-semibold">要対応案件（期限7日以内・超過）</h2>
         </div>
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead>
             <tr className="border-b border-border glass-thead">
               <th className="text-left p-3">案件名</th>
@@ -102,7 +102,7 @@ export default function OpsPage() {
                   </td>
                   <td className="p-3 text-muted-foreground">{c.primaryAssignee?.name ?? "—"}</td>
                   <td className="p-3">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary">
+                    <span className="text-sm px-2 py-0.5 rounded-full bg-secondary">
                       {statusLabels[c.status] ?? c.status}
                     </span>
                   </td>
@@ -111,7 +111,7 @@ export default function OpsPage() {
                   </td>
                   <td className="p-3">
                     {daysLeft !== null && (
-                      <span className={`text-xs font-bold ${daysLeft < 0 ? "text-destructive" : daysLeft <= 3 ? "text-orange-600" : "text-muted-foreground"}`}>
+                      <span className={`text-sm font-bold ${daysLeft < 0 ? "text-destructive" : daysLeft <= 3 ? "text-orange-600" : "text-muted-foreground"}`}>
                         {daysLeft < 0 ? `${Math.abs(daysLeft)}日超過` : `${daysLeft}日`}
                       </span>
                     )}
@@ -136,7 +136,7 @@ export default function OpsPage() {
         <div className="p-4 border-b border-border">
           <h2 className="font-semibold">長期未更新案件（7日以上）</h2>
         </div>
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead>
             <tr className="border-b border-border glass-thead">
               <th className="text-left p-3">案件名</th>
@@ -158,7 +158,7 @@ export default function OpsPage() {
                   </td>
                   <td className="p-3 text-muted-foreground">{c.primaryAssignee?.name ?? "—"}</td>
                   <td className="p-3">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-secondary">
+                    <span className="text-sm px-2 py-0.5 rounded-full bg-secondary">
                       {statusLabels[c.status] ?? c.status}
                     </span>
                   </td>
@@ -166,7 +166,7 @@ export default function OpsPage() {
                     {new Date(c.updatedAt).toLocaleDateString("ja-JP")}
                   </td>
                   <td className="p-3">
-                    <span className={`text-xs font-bold ${daysSince > 14 ? "text-destructive" : "text-orange-600"}`}>
+                    <span className={`text-sm font-bold ${daysSince > 14 ? "text-destructive" : "text-orange-600"}`}>
                       {daysSince}日
                     </span>
                   </td>

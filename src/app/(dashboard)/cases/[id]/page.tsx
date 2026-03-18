@@ -109,29 +109,29 @@ export default function CaseDetailPage() {
       {/* ヘッダー */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/cases" className="text-muted-foreground hover:text-foreground text-sm">
+          <Link href="/cases" className="text-muted-foreground hover:text-foreground text-base">
             &larr; 一覧
           </Link>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-3xl font-bold">
                 {c.caseName ?? c.category ?? `案件 ${c.id.slice(0, 8)}`}
               </h1>
-              <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${statusColors[c.status] ?? "bg-secondary"}`}>
+              <span className={`px-2 py-0.5 text-sm rounded-full font-medium ${statusColors[c.status] ?? "bg-secondary"}`}>
                 {statusLabels[c.status] ?? c.status}
               </span>
               {c.riskLevel && (
-                <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${riskColors[c.riskLevel]}`}>
+                <span className={`px-2 py-0.5 text-sm rounded-full font-medium ${riskColors[c.riskLevel]}`}>
                   リスク: {riskLabels[c.riskLevel]}
                 </span>
               )}
               {c.caseCategory && (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-secondary font-medium">
+                <span className="px-2 py-0.5 text-sm rounded-full bg-secondary font-medium">
                   {categoryLabels[c.caseCategory] ?? c.caseCategory}
                 </span>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-base text-muted-foreground mt-1">
               作成: {new Date(c.createdAt).toLocaleDateString("ja-JP")} /
               担当: {c.primaryAssignee?.name ?? "未割当"}
             </p>
@@ -145,7 +145,7 @@ export default function CaseDetailPage() {
                   closeCase.mutate({ id });
                 }
               }}
-              className="px-3 py-1.5 text-sm border border-destructive text-destructive rounded-lg hover:bg-destructive/10"
+              className="px-3 py-1.5 text-base border border-destructive text-destructive rounded-lg hover:bg-destructive/10"
             >
               案件クローズ
             </button>
@@ -161,7 +161,7 @@ export default function CaseDetailPage() {
               <Link
                 key={tab.key}
                 href={tab.href}
-                className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-border transition-colors"
+                className="px-4 py-2.5 text-base font-medium text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-border transition-colors"
               >
                 {tab.label}
               </Link>
@@ -169,7 +169,7 @@ export default function CaseDetailPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-4 py-2.5 text-base font-medium border-b-2 transition-colors ${
                   activeTab === tab.key
                     ? "text-primary border-primary"
                     : "text-muted-foreground hover:text-foreground border-transparent hover:border-border"
@@ -197,7 +197,7 @@ export default function CaseDetailPage() {
                   <button
                     key={key}
                     onClick={() => updateProgress.mutate({ id, progress: key as any })}
-                    className={`flex-1 py-2 text-xs rounded-md border transition-all ${
+                    className={`flex-1 py-2 text-sm rounded-md border transition-all ${
                       isCurrent
                         ? "bg-primary text-primary-foreground border-primary font-bold"
                         : isCompleted
@@ -216,10 +216,10 @@ export default function CaseDetailPage() {
             {/* 基本情報 */}
             <div className="bg-card border border-border rounded-lg p-5 space-y-4">
               <h2 className="font-semibold">基本情報</h2>
-              <dl className="space-y-2 text-sm">
+              <dl className="space-y-2 text-base">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">案件ID</dt>
-                  <dd className="font-mono text-xs">{c.id.slice(0, 12)}...</dd>
+                  <dd className="font-mono text-sm">{c.id.slice(0, 12)}...</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">ユースケース</dt>
@@ -244,11 +244,11 @@ export default function CaseDetailPage() {
               {/* 事前チャットURL */}
               {c.preChat && (
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs font-medium mb-1">事前チャットURL</p>
-                  <code className="text-xs break-all text-muted-foreground">
+                  <p className="text-sm font-medium mb-1">事前チャットURL</p>
+                  <code className="text-sm break-all text-muted-foreground">
                     {typeof window !== "undefined" ? window.location.origin : ""}/pre-chat/{c.preChat.token}
                   </code>
-                  <p className="text-xs mt-1">
+                  <p className="text-sm mt-1">
                     <span className={`px-1.5 py-0.5 rounded ${c.preChat.isSubmitted ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
                       {c.preChat.isSubmitted ? "提出済" : "未提出"}
                     </span>
@@ -262,7 +262,7 @@ export default function CaseDetailPage() {
               <h2 className="font-semibold">次の作業・期限</h2>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-muted-foreground">作業内容</label>
+                  <label className="text-sm text-muted-foreground">作業内容</label>
                   <input
                     type="text"
                     placeholder="次の作業を入力..."
@@ -272,11 +272,11 @@ export default function CaseDetailPage() {
                         updateNextTask.mutate({ id, nextTask: e.target.value });
                       }
                     }}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">期限</label>
+                  <label className="text-sm text-muted-foreground">期限</label>
                   <input
                     type="date"
                     defaultValue={c.deadline ? new Date(c.deadline).toISOString().split("T")[0] : ""}
@@ -285,11 +285,11 @@ export default function CaseDetailPage() {
                         updateNextTask.mutate({ id, deadline: new Date(e.target.value).toISOString() });
                       }
                     }}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base mt-1"
                   />
                 </div>
                 {c.deadline && (
-                  <p className={`text-xs ${new Date(c.deadline) < new Date() ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+                  <p className={`text-sm ${new Date(c.deadline) < new Date() ? "text-destructive font-medium" : "text-muted-foreground"}`}>
                     {new Date(c.deadline) < new Date() ? "期限超過" : `残り ${Math.ceil((new Date(c.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}日`}
                   </p>
                 )}
@@ -298,10 +298,10 @@ export default function CaseDetailPage() {
               {/* 進捗履歴 */}
               {c.progressHistory.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-medium text-muted-foreground mb-2">進捗履歴</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">進捗履歴</h3>
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {c.progressHistory.map((h: any) => (
-                      <div key={h.id} className="text-xs text-muted-foreground flex gap-2">
+                      <div key={h.id} className="text-sm text-muted-foreground flex gap-2">
                         <span className="whitespace-nowrap">
                           {new Date(h.createdAt).toLocaleDateString("ja-JP")}
                         </span>
@@ -328,15 +328,15 @@ export default function CaseDetailPage() {
                       <Link
                         key={ref.id}
                         href={`/cases/${ref.toCaseId}`}
-                        className="block p-2 border border-border rounded-lg hover:bg-accent text-sm"
+                        className="block p-2 border border-border rounded-lg hover:bg-accent text-base"
                       >
                         <span className="font-medium">{ref.toCase.category ?? ref.toCaseId.slice(0, 8)}</span>
-                        <p className="text-xs text-muted-foreground mt-1">{ref.reason}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{ref.reason}</p>
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">参考案件はありません</p>
+                  <p className="text-base text-muted-foreground">参考案件はありません</p>
                 )}
               </div>
             </div>
@@ -361,7 +361,7 @@ export default function CaseDetailPage() {
                   }
                   setEditingSummary(!editingSummary);
                 }}
-                className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
+                className="px-3 py-1.5 text-base border border-border rounded-lg hover:bg-accent"
               >
                 {editingSummary ? "保存" : "編集"}
               </button>
@@ -377,26 +377,26 @@ export default function CaseDetailPage() {
                   { key: "action", label: "対応（実施したこと）", type: "textarea" },
                 ].map(({ key, label, type }) => (
                   <div key={key} className={type === "textarea" ? "" : ""}>
-                    <label className="text-xs text-muted-foreground font-medium">{label}</label>
+                    <label className="text-sm text-muted-foreground font-medium">{label}</label>
                     {type === "textarea" ? (
                       <textarea
                         value={(summaryForm as any)[key]}
                         onChange={(e) => setSummaryForm((f) => ({ ...f, [key]: e.target.value }))}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base mt-1"
                         rows={3}
                       />
                     ) : (
                       <input
                         value={(summaryForm as any)[key]}
                         onChange={(e) => setSummaryForm((f) => ({ ...f, [key]: e.target.value }))}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm mt-1"
+                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base mt-1"
                       />
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
                 {[
                   { label: "事象カテゴリ", value: c.category },
                   { label: "参考ポイント", value: c.referencePoint },
@@ -405,7 +405,7 @@ export default function CaseDetailPage() {
                   { label: "対応", value: c.action },
                 ].map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-xs text-muted-foreground font-medium">{label}</p>
+                    <p className="text-sm text-muted-foreground font-medium">{label}</p>
                     <p className="mt-1">{value ?? "—"}</p>
                   </div>
                 ))}
@@ -417,7 +417,7 @@ export default function CaseDetailPage() {
           {c.reportContent && (
             <section className="bg-card border border-border rounded-lg p-5">
               <h2 className="font-semibold mb-3">通報内容</h2>
-              <p className="text-sm whitespace-pre-wrap text-muted-foreground">{c.reportContent}</p>
+              <p className="text-base whitespace-pre-wrap text-muted-foreground">{c.reportContent}</p>
             </section>
           )}
         </div>
@@ -487,7 +487,7 @@ function AssigneePanel({
         <h2 className="font-semibold">担当者</h2>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="text-xs text-primary hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           {showAdd ? "閉じる" : "+ 追加"}
         </button>
@@ -495,27 +495,27 @@ function AssigneePanel({
 
       <div className="space-y-2">
         {assignments.map((a: any) => (
-          <div key={a.id} className="flex items-center gap-2 text-sm group">
-            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+          <div key={a.id} className="flex items-center gap-2 text-base group">
+            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
               {a.user.name?.[0] ?? "?"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{a.user.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{a.user.email}</p>
+              <p className="text-base font-medium truncate">{a.user.name}</p>
+              <p className="text-sm text-muted-foreground truncate">{a.user.email}</p>
             </div>
             {primaryAssigneeId === a.userId ? (
-              <span className="text-xs px-1.5 py-0.5 bg-primary text-primary-foreground rounded shrink-0">主担当</span>
+              <span className="text-sm px-1.5 py-0.5 bg-primary text-primary-foreground rounded shrink-0">主担当</span>
             ) : (
               <div className="hidden group-hover:flex gap-1 shrink-0">
                 <button
                   onClick={() => handleSetPrimary(a.userId)}
-                  className="text-xs text-primary hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   主担当に
                 </button>
                 <button
                   onClick={() => handleRemove(a.userId)}
-                  className="text-xs text-destructive hover:underline"
+                  className="text-sm text-destructive hover:underline"
                 >
                   外す
                 </button>
@@ -530,7 +530,7 @@ function AssigneePanel({
           <select
             value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
-            className="flex-1 px-2 py-1.5 text-sm border border-border rounded-lg bg-background"
+            className="flex-1 px-2 py-1.5 text-base border border-border rounded-lg bg-background"
           >
             <option value="">ユーザーを選択</option>
             {availableUsers.map((u: any) => (
@@ -540,7 +540,7 @@ function AssigneePanel({
           <button
             onClick={handleAdd}
             disabled={!selectedUserId || updateAssignees.isPending}
-            className="px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
           >
             追加
           </button>

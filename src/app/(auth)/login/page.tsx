@@ -35,23 +35,23 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 space-y-6 bg-card border border-border rounded-2xl shadow-xl">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-500/20">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20">
               IS
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">面談支援プラットフォーム</h1>
+          <h1 className="text-3xl font-bold text-foreground">面談支援プラットフォーム</h1>
           <p className="text-muted-foreground mt-2">ログイン</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-xl">
+            <div className="p-3 text-base text-destructive bg-destructive/10 rounded-xl">
               {error}
             </div>
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
+            <label htmlFor="email" className="block text-base font-medium text-foreground mb-1">
               メールアドレス
             </label>
             <input
@@ -66,7 +66,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">
+            <label htmlFor="password" className="block text-base font-medium text-foreground mb-1">
               パスワード
             </label>
             <input

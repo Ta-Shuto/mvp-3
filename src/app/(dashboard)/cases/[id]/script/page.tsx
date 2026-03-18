@@ -113,15 +113,15 @@ export default function ScriptGenerationPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-sm">
+          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-base">
             &larr; 案件詳細
           </Link>
-          <h1 className="text-2xl font-bold">台本生成</h1>
+          <h1 className="text-3xl font-bold">台本生成</h1>
         </div>
         {data?.generatedScript && (
           <button
             onClick={handleExportScript}
-            className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-accent"
+            className="px-4 py-2 border border-border rounded-lg text-base hover:bg-accent"
           >
             テキスト出力
           </button>
@@ -135,7 +135,7 @@ export default function ScriptGenerationPage() {
           value={inquiryEmail}
           onChange={(e) => setInquiryEmail(e.target.value)}
           onBlur={() => saveInputs.mutate({ caseId, inquiryEmailText: inquiryEmail })}
-          className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm min-h-32 resize-y"
+          className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base min-h-32 resize-y"
           placeholder="問い合わせメールの内容を入力..."
           rows={6}
         />
@@ -145,7 +145,7 @@ export default function ScriptGenerationPage() {
       <section className="bg-card border border-border rounded-lg p-5">
         <div className="flex justify-between items-center mb-3">
           <h2 className="font-semibold">事前AI回答結果</h2>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 text-base cursor-pointer">
             <input
               type="checkbox"
               checked={usePreAi}
@@ -162,7 +162,7 @@ export default function ScriptGenerationPage() {
           value={preAiResponse}
           onChange={(e) => setPreAiResponse(e.target.value)}
           onBlur={() => saveInputs.mutate({ caseId, preAiResponseText: preAiResponse })}
-          className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm min-h-24 resize-y"
+          className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base min-h-24 resize-y"
           placeholder="事前AIの回答結果を入力..."
           rows={4}
         />
@@ -183,17 +183,17 @@ export default function ScriptGenerationPage() {
       {data?.generatedScript && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold">生成結果</h2>
+            <h2 className="text-xl font-bold">生成結果</h2>
             <div className="flex items-center gap-3">
               {/* トーン選択 */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">トーン:</span>
+                <span className="text-sm text-muted-foreground">トーン:</span>
                 <div className="flex rounded-lg border border-border overflow-hidden">
                   {Object.entries(toneLabels).map(([key, label]) => (
                     <button
                       key={key}
                       onClick={() => setSelectedTone(key)}
-                      className={`px-3 py-1 text-xs font-medium transition-colors ${
+                      className={`px-3 py-1 text-sm font-medium transition-colors ${
                         selectedTone === key
                           ? "bg-primary text-primary-foreground"
                           : "bg-background text-muted-foreground hover:bg-accent"
@@ -209,7 +209,7 @@ export default function ScriptGenerationPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setEditingScript(false)}
-                    className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
+                    className="px-3 py-1.5 text-base border border-border rounded-lg hover:bg-accent"
                   >
                     キャンセル
                   </button>
@@ -219,7 +219,7 @@ export default function ScriptGenerationPage() {
                       setEditingScript(false);
                     }}
                     disabled={saveVersion.isPending}
-                    className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90"
+                    className="px-3 py-1.5 text-base bg-primary text-primary-foreground rounded-lg hover:opacity-90"
                   >
                     保存
                   </button>
@@ -227,7 +227,7 @@ export default function ScriptGenerationPage() {
               ) : (
                 <button
                   onClick={() => setEditingScript(true)}
-                  className="px-3 py-1.5 text-sm border border-border rounded-lg hover:bg-accent"
+                  className="px-3 py-1.5 text-base border border-border rounded-lg hover:bg-accent"
                 >
                   編集
                 </button>
@@ -244,7 +244,7 @@ export default function ScriptGenerationPage() {
                   <button
                     onClick={() => handleRephrase(key, (data.generatedScript as any)[key] ?? "")}
                     disabled={rephrase.isPending && rephraseTarget === key}
-                    className="px-3 py-1 text-xs border border-border rounded-lg hover:bg-accent disabled:opacity-50"
+                    className="px-3 py-1 text-sm border border-border rounded-lg hover:bg-accent disabled:opacity-50"
                   >
                     {rephrase.isPending && rephraseTarget === key ? "変換中..." : `${toneLabels[selectedTone]}トーンに変換`}
                   </button>
@@ -255,11 +255,11 @@ export default function ScriptGenerationPage() {
                 <textarea
                   value={(scriptForm as any)[key]}
                   onChange={(e) => setScriptForm((f) => ({ ...f, [key]: e.target.value }))}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm min-h-24 resize-y"
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-base min-h-24 resize-y"
                   rows={5}
                 />
               ) : (
-                <div className="text-sm whitespace-pre-wrap">
+                <div className="text-base whitespace-pre-wrap">
                   {(data.generatedScript as any)[key] || "（データなし）"}
                 </div>
               )}
@@ -268,23 +268,23 @@ export default function ScriptGenerationPage() {
               {rephraseTarget === key && rephrasedText && !rephrase.isPending && (
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-medium text-blue-700">{toneLabels[selectedTone]}トーンに変換</span>
+                    <span className="text-sm font-medium text-blue-700">{toneLabels[selectedTone]}トーンに変換</span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => applyRephrase(key)}
-                        className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        className="px-2 py-0.5 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                       >
                         適用
                       </button>
                       <button
                         onClick={() => { setRephraseTarget(null); setRephrasedText(""); }}
-                        className="px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+                        className="px-2 py-0.5 text-sm text-muted-foreground hover:text-foreground"
                       >
                         キャンセル
                       </button>
                     </div>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{rephrasedText}</p>
+                  <p className="text-base whitespace-pre-wrap">{rephrasedText}</p>
                 </div>
               )}
             </section>
@@ -296,13 +296,13 @@ export default function ScriptGenerationPage() {
               <h3 className="font-semibold mb-3">バージョン履歴</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {data.versions.map((v: any) => (
-                  <div key={v.id} className="flex items-center justify-between p-2 border border-border rounded-lg text-sm">
+                  <div key={v.id} className="flex items-center justify-between p-2 border border-border rounded-lg text-base">
                     <div className="flex items-center gap-3">
                       <span className="font-medium">v{v.version}</span>
                       <span className="text-muted-foreground">
                         {new Date(v.createdAt).toLocaleString("ja-JP")}
                       </span>
-                      {v.editedBy && <span className="text-xs text-muted-foreground">{v.editedBy.name}</span>}
+                      {v.editedBy && <span className="text-sm text-muted-foreground">{v.editedBy.name}</span>}
                     </div>
                   </div>
                 ))}

@@ -79,16 +79,16 @@ export default function MeetingPage() {
       {/* ヘッダー */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-sm">
+          <Link href={`/cases/${caseId}`} className="text-muted-foreground hover:text-foreground text-base">
             &larr; 案件詳細
           </Link>
-          <h1 className="text-2xl font-bold">面談中支援</h1>
+          <h1 className="text-3xl font-bold">面談中支援</h1>
           {activeMeeting && (
             <>
-              <span className="px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded animate-pulse font-medium">
+              <span className="px-2 py-0.5 text-sm bg-red-100 text-red-800 rounded animate-pulse font-medium">
                 面談中
               </span>
-              <span className="text-sm font-mono text-muted-foreground">
+              <span className="text-base font-mono text-muted-foreground">
                 {formatElapsed(elapsed)}
               </span>
             </>
@@ -107,7 +107,7 @@ export default function MeetingPage() {
               <button
                 key={mode.key}
                 onClick={() => setViewMode(mode.key)}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
+                className={`px-3 py-1 text-sm font-medium transition-colors ${
                   viewMode === mode.key
                     ? "bg-primary text-primary-foreground"
                     : "bg-background text-muted-foreground hover:bg-accent"
@@ -122,7 +122,7 @@ export default function MeetingPage() {
           <select
             value={notificationMode}
             onChange={(e) => setNotificationMode(e.target.value as any)}
-            className="px-2 py-1 text-xs border border-border rounded-lg bg-background"
+            className="px-2 py-1 text-sm border border-border rounded-lg bg-background"
           >
             <option value="all">全通知</option>
             <option value="risk_only">リスクのみ</option>
@@ -130,7 +130,7 @@ export default function MeetingPage() {
           </select>
 
           {/* 自動スクロール */}
-          <label className="flex items-center gap-1 text-xs text-muted-foreground cursor-pointer">
+          <label className="flex items-center gap-1 text-sm text-muted-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={autoScroll}
@@ -144,7 +144,7 @@ export default function MeetingPage() {
 
       {/* 統計バー */}
       {currentMeeting && (
-        <div className="flex gap-4 text-sm">
+        <div className="flex gap-4 text-base">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">発言数:</span>
             <span className="font-medium">{currentMeeting.transcripts?.length ?? 0}</span>
@@ -170,7 +170,7 @@ export default function MeetingPage() {
       {!currentMeeting && (
         <div className="bg-card border border-border rounded-lg p-8 text-center">
           <p className="text-muted-foreground">面談データがありません。</p>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-base text-muted-foreground mt-2">
             会議ツール（Teams/Zoom）のBotが入室すると、ここにリアルタイムの文字起こしとリスク判定が表示されます。
           </p>
         </div>
@@ -191,25 +191,25 @@ export default function MeetingPage() {
                   placeholder="検索..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
-                  className="px-2 py-1 border border-border rounded-lg text-xs w-40"
+                  className="px-2 py-1 border border-border rounded-lg text-sm w-40"
                 />
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {filteredTranscripts.map((t: any) => (
-                  <div key={t.id} className={`flex gap-2 text-sm ${!t.isFinal ? "opacity-60" : ""}`}>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap min-w-14">
+                  <div key={t.id} className={`flex gap-2 text-base ${!t.isFinal ? "opacity-60" : ""}`}>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap min-w-14">
                       {Math.floor(t.timestamp / 60)}:{String(Math.floor(t.timestamp % 60)).padStart(2, "0")}
                     </span>
                     <span className="font-medium min-w-20 text-primary">{t.speaker}</span>
                     <span className="flex-1">{t.text}</span>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${confidenceColors[t.confidence] ?? ""}`}>
+                    <span className={`text-sm px-1.5 py-0.5 rounded ${confidenceColors[t.confidence] ?? ""}`}>
                       {confidenceLabels[t.confidence] ?? t.confidence}
                     </span>
-                    {!t.isFinal && <span className="text-xs text-yellow-600">暫定</span>}
+                    {!t.isFinal && <span className="text-sm text-yellow-600">暫定</span>}
                   </div>
                 ))}
                 {filteredTranscripts.length === 0 && (
-                  <p className="text-center text-muted-foreground text-sm py-8">
+                  <p className="text-center text-muted-foreground text-base py-8">
                     文字起こしデータを待機中...
                   </p>
                 )}
@@ -224,29 +224,29 @@ export default function MeetingPage() {
               <div className="p-3 border-b border-border flex justify-between items-center">
                 <h2 className="font-semibold">リスク判定</h2>
                 {pendingRiskCount > 0 && (
-                  <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700 font-medium">
+                  <span className="px-2 py-0.5 text-sm rounded-full bg-red-100 text-red-700 font-medium">
                     {pendingRiskCount}件未対応
                   </span>
                 )}
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-3">
                 {currentMeeting.riskItems?.map((r: any) => (
-                  <div key={r.id} className={`p-3 border rounded-lg text-sm space-y-2 ${
+                  <div key={r.id} className={`p-3 border rounded-lg text-base space-y-2 ${
                     r.status === "PENDING" ? "border-red-200 bg-red-50/50" : "border-border"
                   }`}>
                     <div className="flex justify-between items-start">
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${confidenceColors[r.confidence] ?? ""}`}>
+                      <span className={`text-sm px-1.5 py-0.5 rounded ${confidenceColors[r.confidence] ?? ""}`}>
                         信頼度: {confidenceLabels[r.confidence] ?? r.confidence}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm text-muted-foreground">
                         {Math.floor(r.timestamp / 60)}:{String(Math.floor(r.timestamp % 60)).padStart(2, "0")}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">{r.speaker}</p>
+                    <p className="text-sm text-muted-foreground">{r.speaker}</p>
                     <p className="font-medium">&ldquo;{r.text}&rdquo;</p>
-                    <p className="text-muted-foreground text-xs">理由: {r.reason}</p>
+                    <p className="text-muted-foreground text-sm">理由: {r.reason}</p>
                     {r.rephrasing && (
-                      <div className="bg-muted p-2 rounded text-xs">
+                      <div className="bg-muted p-2 rounded text-sm">
                         <span className="font-medium">言い換え案: </span>{r.rephrasing}
                       </div>
                     )}
@@ -255,19 +255,19 @@ export default function MeetingPage() {
                         <>
                           <button
                             onClick={() => updateRiskStatus.mutate({ riskItemId: r.id, status: "ACCEPTED" })}
-                            className="px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
+                            className="px-2 py-0.5 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
                           >
                             採択
                           </button>
                           <button
                             onClick={() => updateRiskStatus.mutate({ riskItemId: r.id, status: "REJECTED" })}
-                            className="px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
+                            className="px-2 py-0.5 text-sm bg-red-100 text-red-800 rounded hover:bg-red-200 transition-colors"
                           >
                             却下
                           </button>
                         </>
                       ) : (
-                        <span className={`text-xs px-2 py-0.5 rounded ${
+                        <span className={`text-sm px-2 py-0.5 rounded ${
                           r.status === "ACCEPTED" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                         }`}>
                           {r.status === "ACCEPTED" ? "採択" : "却下"}
@@ -277,7 +277,7 @@ export default function MeetingPage() {
                   </div>
                 ))}
                 {(!currentMeeting.riskItems || currentMeeting.riskItems.length === 0) && (
-                  <p className="text-center text-muted-foreground text-sm py-8">
+                  <p className="text-center text-muted-foreground text-base py-8">
                     リスク項目なし
                   </p>
                 )}

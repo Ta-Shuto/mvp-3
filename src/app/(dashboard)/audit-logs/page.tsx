@@ -61,8 +61,8 @@ export default function AuditLogsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">監査ログ</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="text-3xl font-bold">監査ログ</h1>
+        <p className="text-base text-muted-foreground mt-1">
           システム操作の追跡記録（改竄不可）
         </p>
       </div>
@@ -72,7 +72,7 @@ export default function AuditLogsPage() {
         <select
           value={filters.eventType ?? ""}
           onChange={(e) => setFilters((f) => ({ ...f, eventType: e.target.value || undefined, page: 1 }))}
-          className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
+          className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-base"
         >
           <option value="">イベント種別: 全て</option>
           {Object.entries(eventTypeLabels).map(([k, v]) => (
@@ -81,26 +81,26 @@ export default function AuditLogsPage() {
         </select>
 
         <div className="flex items-center gap-2">
-          <label className="text-sm text-muted-foreground">期間:</label>
+          <label className="text-base text-muted-foreground">期間:</label>
           <input
             type="date"
             value={filters.dateFrom}
             onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
+            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-base"
           />
           <span className="text-muted-foreground">〜</span>
           <input
             type="date"
             value={filters.dateTo}
             onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value, page: 1 }))}
-            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-sm"
+            className="px-3 py-2 border border-white/50 rounded-xl bg-white/30 text-base"
           />
         </div>
 
         {(filters.eventType || filters.dateFrom || filters.dateTo) && (
           <button
             onClick={() => setFilters({ eventType: undefined, dateFrom: "", dateTo: "", page: 1 })}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground"
           >
             フィルタをクリア
           </button>
@@ -109,7 +109,7 @@ export default function AuditLogsPage() {
 
       {/* ログ一覧 */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead>
             <tr className="border-b border-border glass-thead">
               <th className="text-left p-3 font-medium text-muted-foreground w-8"></th>
@@ -128,14 +128,14 @@ export default function AuditLogsPage() {
                   className="border-b border-white/20 hover:bg-white/30 cursor-pointer"
                   onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                 >
-                  <td className="p-3 text-muted-foreground text-xs">
+                  <td className="p-3 text-muted-foreground text-sm">
                     {log.details ? (expandedId === log.id ? "▼" : "▶") : ""}
                   </td>
                   <td className="p-3 text-muted-foreground whitespace-nowrap">
                     {new Date(log.createdAt).toLocaleString("ja-JP")}
                   </td>
                   <td className="p-3">
-                    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${eventTypeColors[log.eventType] ?? "bg-secondary"}`}>
+                    <span className={`px-2 py-0.5 text-sm rounded-full font-medium ${eventTypeColors[log.eventType] ?? "bg-secondary"}`}>
                       {eventTypeLabels[log.eventType] ?? log.eventType}
                     </span>
                   </td>
@@ -144,7 +144,7 @@ export default function AuditLogsPage() {
                     {log.caseId ? (
                       <Link
                         href={`/cases/${log.caseId}`}
-                        className="text-xs font-mono text-primary hover:underline"
+                        className="text-sm font-mono text-primary hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {log.caseId.slice(0, 8)}
@@ -153,14 +153,14 @@ export default function AuditLogsPage() {
                       <span className="text-muted-foreground">—</span>
                     )}
                   </td>
-                  <td className="p-3 text-xs text-muted-foreground max-w-xs truncate">
+                  <td className="p-3 text-sm text-muted-foreground max-w-xs truncate">
                     {formatDetails(log.eventType, log.details)}
                   </td>
                 </tr>
                 {expandedId === log.id && log.details && (
                   <tr key={`${log.id}-detail`} className="border-b border-white/20">
                     <td colSpan={6} className="p-4 bg-white/20">
-                      <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono">
+                      <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-mono">
                         {JSON.stringify(log.details, null, 2)}
                       </pre>
                     </td>
@@ -182,17 +182,17 @@ export default function AuditLogsPage() {
           <button
             onClick={() => setFilters((f) => ({ ...f, page: Math.max(1, f.page - 1) }))}
             disabled={filters.page <= 1}
-            className="px-3 py-1 rounded-xl text-sm border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
+            className="px-3 py-1 rounded-xl text-base border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
           >
             前へ
           </button>
-          <span className="px-3 py-1 text-sm text-muted-foreground">
+          <span className="px-3 py-1 text-base text-muted-foreground">
             {filters.page} / {(logs.data as any)?.totalPages}
           </span>
           <button
             onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
             disabled={filters.page >= (logs.data as any)?.totalPages}
-            className="px-3 py-1 rounded-xl text-sm border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
+            className="px-3 py-1 rounded-xl text-base border border-white/50 bg-white/30 hover:bg-white/50 disabled:opacity-30"
           >
             次へ
           </button>

@@ -55,8 +55,8 @@ export default function PreChatPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="bg-card p-8 rounded-lg border border-border max-w-md text-center">
-          <h1 className="text-xl font-bold text-destructive mb-2">リンクが無効です</h1>
-          <p className="text-sm text-muted-foreground">このリンクは無効か、期限が切れています。</p>
+          <h1 className="text-2xl font-bold text-destructive mb-2">リンクが無効です</h1>
+          <p className="text-base text-muted-foreground">このリンクは無効か、期限が切れています。</p>
         </div>
       </div>
     );
@@ -77,11 +77,11 @@ export default function PreChatPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="bg-card p-8 rounded-lg border border-border max-w-lg w-full">
-          <h1 className="text-xl font-bold mb-4">事前チャット</h1>
-          <p className="text-sm text-muted-foreground mb-2">
+          <h1 className="text-2xl font-bold mb-4">事前チャット</h1>
+          <p className="text-base text-muted-foreground mb-2">
             {data.case?.organization?.name}
           </p>
-          <div className="bg-muted p-4 rounded-md mb-6 text-sm space-y-2">
+          <div className="bg-muted p-4 rounded-md mb-6 text-base space-y-2">
             <p>こちらは面談の事前準備のためのチャットページです。</p>
             <p>いくつかの質問にお答えいただき、AIアシスタントに自由にご相談いただけます。</p>
             <p>入力内容は面談担当者に共有されます。</p>
@@ -104,8 +104,8 @@ export default function PreChatPage() {
       <div className="min-h-screen bg-background p-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-card p-6 rounded-lg border border-border mb-6">
-            <h1 className="text-xl font-bold mb-2">提出完了</h1>
-            <p className="text-sm text-muted-foreground">ご回答ありがとうございました。内容は面談担当者に共有されました。</p>
+            <h1 className="text-2xl font-bold mb-2">提出完了</h1>
+            <p className="text-base text-muted-foreground">ご回答ありがとうございました。内容は面談担当者に共有されました。</p>
           </div>
 
           {/* 事前質問の回答表示 */}
@@ -114,8 +114,8 @@ export default function PreChatPage() {
               <h2 className="font-semibold mb-3">事前質問の回答</h2>
               {data.answers.map((a: any, i: number) => (
                 <div key={a.id} className="mb-3">
-                  <p className="text-sm text-muted-foreground">質問 {i + 1}</p>
-                  <p className="text-sm">{a.answerText}</p>
+                  <p className="text-base text-muted-foreground">質問 {i + 1}</p>
+                  <p className="text-base">{a.answerText}</p>
                 </div>
               ))}
             </div>
@@ -128,7 +128,7 @@ export default function PreChatPage() {
               <div className="space-y-3">
                 {data.messages.map((m: any) => (
                   <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                    <div className={`max-w-[80%] p-3 rounded-lg text-base ${
                       m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                     }`}>
                       {m.content}
@@ -152,18 +152,18 @@ export default function PreChatPage() {
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="bg-card p-8 rounded-lg border border-border max-w-lg w-full">
           <div className="flex justify-between items-center mb-6">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-base text-muted-foreground">
               質問 {currentQuestionIndex + 1} / {preQuestions.length}
             </span>
             <button
               onClick={() => setPhase("chat")}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="text-base text-muted-foreground hover:text-foreground"
             >
               事前質問をスキップ →
             </button>
           </div>
 
-          <h2 className="text-lg font-medium mb-4">{currentQuestion.text}</h2>
+          <h2 className="text-xl font-medium mb-4">{currentQuestion.text}</h2>
 
           <textarea
             value={answers[questionId] ?? ""}
@@ -173,7 +173,7 @@ export default function PreChatPage() {
                 saveAnswer.mutate({ token, questionId, answerText: answers[questionId] });
               }
             }}
-            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm min-h-32"
+            className="w-full px-3 py-2 border border-input rounded-md bg-background text-base min-h-32"
             placeholder="ご回答を入力してください..."
             rows={5}
           />
@@ -182,7 +182,7 @@ export default function PreChatPage() {
             <button
               onClick={() => setCurrentQuestionIndex((i) => Math.max(0, i - 1))}
               disabled={currentQuestionIndex === 0}
-              className="px-4 py-2 text-sm border border-input rounded-md hover:bg-accent disabled:opacity-30"
+              className="px-4 py-2 text-base border border-input rounded-md hover:bg-accent disabled:opacity-30"
             >
               前へ
             </button>
@@ -197,7 +197,7 @@ export default function PreChatPage() {
                   setPhase("chat");
                 }
               }}
-              className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90"
+              className="px-4 py-2 text-base bg-primary text-primary-foreground rounded-md hover:opacity-90"
             >
               {currentQuestionIndex < preQuestions.length - 1 ? "次へ" : "AIチャットへ"}
             </button>
@@ -211,7 +211,7 @@ export default function PreChatPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="bg-card border-b border-border p-4 flex justify-between items-center">
-        <h1 className="text-lg font-bold">AIチャット相談</h1>
+        <h1 className="text-xl font-bold">AIチャット相談</h1>
         <button
           onClick={() => {
             if (confirm("提出すると編集できなくなります。よろしいですか？")) {
@@ -219,7 +219,7 @@ export default function PreChatPage() {
             }
           }}
           disabled={submit.isPending}
-          className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
+          className="px-4 py-2 text-base bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
         >
           {submit.isPending ? "提出中..." : "提出する"}
         </button>
@@ -227,13 +227,13 @@ export default function PreChatPage() {
 
       <div className="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-3">
         {data.messages?.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-8">
+          <div className="text-center text-muted-foreground text-base py-8">
             AIアシスタントに自由にご相談ください。
           </div>
         )}
         {data.messages?.map((m: any) => (
           <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] p-3 rounded-lg text-sm whitespace-pre-wrap ${
+            <div className={`max-w-[80%] p-3 rounded-lg text-base whitespace-pre-wrap ${
               m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
             }`}>
               {m.content}
@@ -242,7 +242,7 @@ export default function PreChatPage() {
         ))}
         {sendAiMessage.isPending && (
           <div className="flex justify-start">
-            <div className="bg-muted p-3 rounded-lg text-sm text-muted-foreground">
+            <div className="bg-muted p-3 rounded-lg text-base text-muted-foreground">
               考え中...
             </div>
           </div>
@@ -264,13 +264,13 @@ export default function PreChatPage() {
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             placeholder="メッセージを入力..."
-            className="flex-1 px-3 py-2 border border-input rounded-md bg-background text-sm"
+            className="flex-1 px-3 py-2 border border-input rounded-md bg-background text-base"
             disabled={sendAiMessage.isPending}
           />
           <button
             type="submit"
             disabled={!chatInput.trim() || sendAiMessage.isPending}
-            className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 text-base bg-primary text-primary-foreground rounded-md hover:opacity-90 disabled:opacity-50"
           >
             送信
           </button>
