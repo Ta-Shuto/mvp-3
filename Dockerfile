@@ -18,6 +18,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/src/generated ./src/generated
 COPY . .
 
+# Remove seed scripts not needed for production build (avoids TS errors during next build)
+RUN rm -f prisma/seed-dummy.ts
+
 # Remove dev-only config
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
