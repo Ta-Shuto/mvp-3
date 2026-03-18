@@ -9,6 +9,8 @@ const navigation = [
   { name: "ダッシュボード", href: "/", icon: "grid", roles: ["ADMIN", "INTERVIEWER"] },
   { name: "通報・案件管理", href: "/cases", icon: "folder", roles: ["ADMIN", "INTERVIEWER"] },
   { name: "面談管理", href: "/interviews", icon: "mic", roles: ["ADMIN", "INTERVIEWER"] },
+  { name: "質問管理", href: "/questions", icon: "help-circle", roles: ["ADMIN", "INTERVIEWER"] },
+  { name: "分析・レポート", href: "/analysis", icon: "bar-chart", roles: ["ADMIN", "INTERVIEWER"] },
   { name: "テンプレート", href: "/templates", icon: "file-text", roles: ["ADMIN"] },
   { name: "ユーザー管理", href: "/users", icon: "users", roles: ["ADMIN"] },
   { name: "監査ログ", href: "/audit-logs", icon: "shield", roles: ["ADMIN"] },
@@ -25,6 +27,8 @@ const icons: Record<string, React.ReactElement> = {
   shield: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
   settings: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" /></svg>,
   activity: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12" /></svg>,
+  "help-circle": <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>,
+  "bar-chart": <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10" /><line x1="18" y1="20" x2="18" y2="4" /><line x1="6" y1="20" x2="6" y2="16" /></svg>,
 };
 
 function isActive(pathname: string, href: string): boolean {

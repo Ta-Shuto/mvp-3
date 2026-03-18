@@ -8,6 +8,8 @@ import { auditLogRouter } from "./routers/auditLog";
 import { scriptGenerationRouter } from "./routers/scriptGeneration";
 import { userRouter } from "./routers/user";
 import { orgSettingsRouter } from "./routers/orgSettings";
+import { questionRouter } from "./routers/question";
+import { analysisRouter } from "./routers/analysis";
 
 export const appRouter = router({
   dashboard: dashboardRouter,
@@ -19,6 +21,8 @@ export const appRouter = router({
   scriptGeneration: scriptGenerationRouter,
   user: userRouter,
   orgSettings: orgSettingsRouter,
+  question: questionRouter,
+  analysis: analysisRouter,
 });
 
 export type AppRouter = typeof appRouter;

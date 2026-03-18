@@ -56,6 +56,8 @@ export function getTenantDb(organizationId: string) {
           ...args,
           where: { ...args?.where, organizationId },
         }),
+      update: (args: any) =>
+        prisma.template.update(args),
     },
     auditLog: {
       findMany: (args?: any) =>
@@ -67,6 +69,20 @@ export function getTenantDb(organizationId: string) {
         prisma.auditLog.create({
           ...args,
           data: { ...args.data, organizationId },
+        }),
+    },
+    preChat: {
+      findMany: (args?: any) =>
+        prisma.preChat.findMany({
+          ...args,
+          where: { ...args?.where, case: { organizationId } },
+        }),
+    },
+    riskItem: {
+      findMany: (args?: any) =>
+        prisma.riskItem.findMany({
+          ...args,
+          where: { ...args?.where, meeting: { case: { organizationId } } },
         }),
     },
     organization: {
