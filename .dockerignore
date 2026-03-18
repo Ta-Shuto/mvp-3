@@ -9,5 +9,5 @@ node_modules
 .env.production
 docker-compose*.yml
 Dockerfile*
-prisma/seed-dummy.ts
+**/seed-dummy.ts
 src/generated
