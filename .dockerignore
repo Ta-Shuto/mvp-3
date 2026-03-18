@@ -9,3 +9,4 @@ node_modules
 .env.production
 docker-compose*.yml
 Dockerfile*
+prisma/seed*.ts
