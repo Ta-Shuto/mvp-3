@@ -79,24 +79,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
 /* Global font size scaling */
-h1 { font-size: 2.125rem; }
-h2 { font-size: 1.625rem; }
-h3 { font-size: 1.375rem; }
+h1 { font-size: 2.0625rem; }
+h2 { font-size: 1.5625rem; }
+h3 { font-size: 1.3125rem; }
 p, span, a, button, input, select, textarea, label, td, th, li {
   font-size: inherit;
 }
-.text-xs { font-size: 0.9375rem !important; }
-.text-sm { font-size: 1.0625rem !important; }
-.text-base { font-size: 1.1875rem !important; }
-.text-lg { font-size: 1.3125rem !important; }
-.text-xl { font-size: 1.5rem !important; }
-.text-2xl { font-size: 1.75rem !important; }
-.text-3xl { font-size: 2.125rem !important; }
+.text-xs { font-size: 0.875rem !important; }
+.text-sm { font-size: 1rem !important; }
+.text-base { font-size: 1.125rem !important; }
+.text-lg { font-size: 1.25rem !important; }
+.text-xl { font-size: 1.4375rem !important; }
+.text-2xl { font-size: 1.6875rem !important; }
+.text-3xl { font-size: 2.0625rem !important; }
 
 /* Glassmorphism: auto-apply backdrop-filter to card elements */
 .bg-card,
