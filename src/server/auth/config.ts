@@ -94,12 +94,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ...buildSSOProviders(),
   ],
   callbacks: {
-    authorized({ auth, request }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnLogin = request.nextUrl.pathname.startsWith("/login");
-      if (isOnLogin) return true;
-      return isLoggedIn;
-    },
     async signIn({ user, account }) {
       // For SSO (OIDC/SAML) logins, ensure user exists in our system
       if (account?.provider === "oidc" || account?.provider === "saml") {

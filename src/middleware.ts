@@ -1,15 +1,21 @@
-export { auth as middleware } from "@/server/auth/config";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+  const token =
+    request.cookies.get("authjs.session-token") ??
+    request.cookies.get("__Secure-authjs.session-token");
+
+  if (!token) {
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except:
-     * - /login
-     * - /api/auth (NextAuth routes)
-     * - /api/health (health check)
-     * - /_next (Next.js internals)
-     * - /favicon.ico, /robots.txt, static files
-     */
     "/((?!login|api/auth|api/health|_next|favicon\\.ico|robots\\.txt|.*\\.).*)",
   ],
 };
