@@ -402,6 +402,8 @@ Resources:
           Environment:
             - Name: NODE_ENV
               Value: production
+            - Name: NODE_TLS_REJECT_UNAUTHORIZED
+              Value: "0"
             - Name: DATABASE_URL
               Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=require&uselibpqcompat=true"
             - Name: REDIS_URL
@@ -460,6 +462,8 @@ Resources:
           Environment:
             - Name: NODE_ENV
               Value: production
+            - Name: NODE_TLS_REJECT_UNAUTHORIZED
+              Value: "0"
             - Name: WS_SERVER_PORT
               Value: "3001"
             - Name: DATABASE_URL
@@ -591,7 +595,7 @@ Resources:
       ServiceName: !Sub "${Environment}-web"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref NextJSTaskDefinition
-      DesiredCount: 0
+      DesiredCount: 1
       LaunchType: FARGATE
       HealthCheckGracePeriodSeconds: 120
       NetworkConfiguration:
@@ -612,7 +616,7 @@ Resources:
       ServiceName: !Sub "${Environment}-ws"
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref WSServerTaskDefinition
-      DesiredCount: 0
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
