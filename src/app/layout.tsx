@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/common/Providers";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { ToastContainer } from "@/components/common/Toast";
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "面談支援プラットフォーム",
@@ -16,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className="antialiased">
+      <body className={`${notoSansJP.className} antialiased`}>
         <Providers>
           <ErrorBoundary>
             {children}
