@@ -7,7 +7,7 @@ const envSchema = z.object({
   NEXTAUTH_SECRET: z.string().min(16, "NEXTAUTH_SECRET must be at least 16 characters"),
 
   // Optional with defaults
-  ANTHROPIC_API_KEY: z.string().optional().default(""),
+  GEMINI_API_KEY: z.string().optional().default(""),
   WS_SERVER_PORT: z.coerce.number().optional().default(3001),
   S3_ENDPOINT: z.string().optional().default("http://localhost:9000"),
   S3_ACCESS_KEY: z.string().optional().default("minioadmin"),

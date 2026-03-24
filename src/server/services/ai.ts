@@ -1,8 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 interface AIOptions {
   systemPrompt: string;
@@ -11,28 +9,34 @@ interface AIOptions {
 }
 
 /**
- * Generate AI response using Claude API (FR-029, FR-034, FR-035, FR-118)
+ * Generate AI response using Google Gemini API (FR-029, FR-034, FR-035, FR-118)
  */
 export async function generateAIResponse(options: AIOptions): Promise<string> {
   const { systemPrompt, messages, maxTokens = 2048 } = options;
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return "（AI応答を利用するにはANTHROPIC_API_KEYの設定が必要です）";
+  if (!process.env.GEMINI_API_KEY) {
+    return "（AI応答を利用するにはGEMINI_API_KEYの設定が必要です）";
   }
 
   try {
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      systemInstruction: systemPrompt,
     });
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    return textBlock ? textBlock.text : "";
+    const contents = messages.map((m) => ({
+      role: m.role === "assistant" ? ("model" as const) : ("user" as const),
+      parts: [{ text: m.content }],
+    }));
+
+    const result = await model.generateContent({
+      contents,
+      generationConfig: {
+        maxOutputTokens: maxTokens,
+      },
+    });
+
+    return result.response.text();
   } catch (error) {
     console.error("AI API error:", error);
     throw new Error("AI応答の生成に失敗しました。しばらくしてから再試行してください。");

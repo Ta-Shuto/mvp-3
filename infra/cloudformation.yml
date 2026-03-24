@@ -23,10 +23,10 @@ Parameters:
     NoEcho: true
     Description: NextAuth.js secret key
 
-  AnthropicApiKey:
+  GeminiApiKey:
     Type: String
     NoEcho: true
-    Description: Anthropic Claude API key
+    Description: Google Gemini API key
 
   RecallApiKey:
     Type: String
@@ -416,8 +416,8 @@ Resources:
               Value: "true"
             - Name: NEXTAUTH_SECRET
               Value: !Ref NextAuthSecret
-            - Name: ANTHROPIC_API_KEY
-              Value: !Ref AnthropicApiKey
+            - Name: GEMINI_API_KEY
+              Value: !Ref GeminiApiKey
             - Name: RECALL_API_KEY
               Value: !Ref RecallApiKey
             - Name: S3_BUCKET
@@ -468,8 +468,8 @@ Resources:
               Value: "3001"
             - Name: DATABASE_URL
               Value: !Sub "postgresql://postgres:${DBPassword}@${Database.Endpoint.Address}:5432/interview_support?sslmode=require&uselibpqcompat=true"
-            - Name: ANTHROPIC_API_KEY
-              Value: !Ref AnthropicApiKey
+            - Name: GEMINI_API_KEY
+              Value: !Ref GeminiApiKey
           LogConfiguration:
             LogDriver: awslogs
             Options:

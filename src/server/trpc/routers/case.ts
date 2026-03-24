@@ -204,16 +204,11 @@ export const caseRouter = router({
     .input(z.object({ reportContent: z.string().min(1) }))
     .mutation(async ({ input }) => {
       try {
-        const { default: Anthropic } = await import("@anthropic-ai/sdk");
-        const client = new Anthropic();
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-        const response = await client.messages.create({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 512,
-          messages: [
-            {
-              role: "user",
-              content: `以下の内部通報・相談内容を分析し、JSON形式で回答してください。
+        const result = await model.generateContent(`以下の内部通報・相談内容を分析し、JSON形式で回答してください。
 
 通報内容:
 ${input.reportContent}
@@ -236,12 +231,9 @@ ${input.reportContent}
 - URGENT: 即座の対応が必要（身体的危険、重大な法令違反等）
 - HIGH: 早急な対応が必要（継続的なハラスメント、大規模不正等）
 - MEDIUM: 通常の対応フロー（単発事象、軽微な違反等）
-- LOW: 情報提供レベル（匿名の噂、確認事項等）`,
-            },
-          ],
-        });
+- LOW: 情報提供レベル（匿名の噂、確認事項等）`);
 
-        const text = response.content[0].type === "text" ? response.content[0].text : "";
+        const text = result.response.text();
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           return { caseName: "", caseCategory: "OTHER" as const, riskLevel: "MEDIUM" as const, summary: "" };

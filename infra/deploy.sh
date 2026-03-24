@@ -14,7 +14,7 @@ set -euo pipefail
 #   - jq installed
 #
 # Environment variables (set in .env.production):
-#   DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY
+#   DB_PASSWORD, NEXTAUTH_SECRET, GEMINI_API_KEY
 #
 # Optional SSL variables:
 #   DOMAIN_NAME       - Custom domain (e.g. interview.example.com)
@@ -49,7 +49,7 @@ if [ -f ".env.production" ]; then
   rm -f "$_tmpenv"
 else
   echo "ERROR: .env.production not found."
-  echo "Create it with: DB_PASSWORD, NEXTAUTH_SECRET, ANTHROPIC_API_KEY"
+  echo "Create it with: DB_PASSWORD, NEXTAUTH_SECRET, GEMINI_API_KEY"
   exit 1
 fi
 
@@ -64,7 +64,7 @@ aws cloudformation deploy \
     Environment="${ENV}" \
     DBPassword="${DB_PASSWORD}" \
     NextAuthSecret="${NEXTAUTH_SECRET}" \
-    AnthropicApiKey="${ANTHROPIC_API_KEY}" \
+    GeminiApiKey="${GEMINI_API_KEY}" \
     RecallApiKey="${RECALL_API_KEY:-}" \
     DomainName="${DOMAIN_NAME:-}" \
     CertificateArn="${CERTIFICATE_ARN:-}" \

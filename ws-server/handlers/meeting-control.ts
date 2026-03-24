@@ -75,32 +75,27 @@ async function generateMeetingSummaryAsync(meetingId: string) {
 
   if (!meeting || meeting.transcripts.length === 0) return;
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     console.log("[WS] Skipping summary generation - no API key");
     return;
   }
 
-  const { default: Anthropic } = await import("@anthropic-ai/sdk");
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const { GoogleGenerativeAI } = await import("@google/generative-ai");
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: "以下の面談の文字起こしから、JSON形式で要点を生成してください。",
+  });
 
   const transcriptText = meeting.transcripts
     .map((t: any) => `[${Math.floor(t.timestamp / 60)}:${String(Math.floor(t.timestamp % 60)).padStart(2, "0")}] ${t.speaker}: ${t.text}`)
     .join("\n");
 
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    system: "以下の面談の文字起こしから、JSON形式で要点を生成してください。",
-    messages: [
-      {
-        role: "user",
-        content: `${transcriptText}\n\nJSON形式で回答:\n{"keyPoints": "要点（箇条書き）", "actionItems": "アクションアイテム", "concerns": "懸念事項"}`,
-      },
-    ],
-  });
+  const result = await model.generateContent(
+    `${transcriptText}\n\nJSON形式で回答:\n{"keyPoints": "要点（箇条書き）", "actionItems": "アクションアイテム", "concerns": "懸念事項"}`
+  );
 
-  const textBlock = response.content.find((block: any) => block.type === "text") as any;
-  const responseText = textBlock?.text ?? "";
+  const responseText = result.response.text();
 
   try {
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

@@ -1,10 +1,8 @@
 import { Server } from "socket.io";
 import { getPrisma } from "../db";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 interface FinalizedTranscript {
   transcriptId: string;
@@ -23,7 +21,7 @@ export async function handleRiskDetection(io: Server, data: FinalizedTranscript)
   const prisma = getPrisma();
   const { meetingId, speaker, text, timestamp } = data;
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return; // Skip if no API key
   }
 
@@ -40,20 +38,16 @@ export async function handleRiskDetection(io: Server, data: FinalizedTranscript)
     const riskPrompt = templateSnapshot?.riskDetectionPrompt ||
       "以下の面談中の発言にリスクがないか判定してください。パワハラ・セクハラ・脅迫・不適切な表現・法的リスクのある発言を検出してください。";
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 512,
-      system: riskPrompt,
-      messages: [
-        {
-          role: "user",
-          content: `話者: ${speaker}\n発言: ${text}\n\nJSON形式で回答:\n{"isRisky": boolean, "reason": "理由", "confidence": "HIGH|MEDIUM|LOW", "rephrasing": "言い換え案（リスクありの場合のみ）"}`,
-        },
-      ],
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      systemInstruction: riskPrompt,
     });
 
-    const textBlock = response.content.find((block) => block.type === "text");
-    const responseText = textBlock?.text ?? "";
+    const response = await model.generateContent(
+      `話者: ${speaker}\n発言: ${text}\n\nJSON形式で回答:\n{"isRisky": boolean, "reason": "理由", "confidence": "HIGH|MEDIUM|LOW", "rephrasing": "言い換え案（リスクありの場合のみ）"}`
+    );
+
+    const responseText = response.response.text();
 
     let result = { isRisky: false, reason: "", confidence: "LOW" as const, rephrasing: undefined as string | undefined };
     try {
